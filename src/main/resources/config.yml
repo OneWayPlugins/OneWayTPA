@@ -1,0 +1,19 @@
+# Tempo em segundos para expirar um pedido pendente.
+request-expire-seconds: 60
+
+# Tempo em segundos entre aceitar e executar o teleporte.
+# Durante esse tempo, /tpacancel pode cancelar.
+teleport-delay-seconds: 5
+
+# Cooldown de envio por grupo.
+# A ordem importa: o primeiro grupo com permissao correspondente sera usado.
+cooldown-groups:
+  vip:
+    permission: "onewaytpa.cooldown.vip"
+    seconds: 10
+  membro:
+    permission: "onewaytpa.cooldown.membro"
+    seconds: 20
+  default:
+    permission: ""
+    seconds: 30

@@ -1,0 +1,99 @@
+name: OneWayTPA
+version: '1.0.0'
+main: net.onewaycraft.oneWayTPA.OneWayTPA
+api-version: '1.21'
+folia-supported: true
+commands:
+  tpa:
+    description: Envia um pedido para teleportar ate outro jogador.
+    usage: /tpa <jogador>
+    permission: onewaytpa.tpa
+  tpahere:
+    description: Envia um pedido para trazer outro jogador ate voce.
+    usage: /tpahere <jogador>
+    aliases: [tpaaqui]
+    permission: onewaytpa.tpahere
+  tpaccept:
+    description: Aceita um pedido de teleporte.
+    usage: /tpaccept <jogador>
+    permission: onewaytpa.tpaccept
+  tpadeny:
+    description: Recusa um pedido de teleporte.
+    usage: /tpadeny <jogador>
+    aliases: [tparecusar]
+    permission: onewaytpa.tpadeny
+  tpauto:
+    description: Ativa ou desativa auto-aceite para pedidos /tpa.
+    usage: /tpauto
+    permission: onewaytpa.tpauto
+  tpaauto:
+    description: Ativa ou desativa auto-aceite de /tpa para um jogador especifico.
+    usage: /tpaauto <jogador>
+    permission: onewaytpa.tpaauto
+  tpaignore:
+    description: Ignora pedidos de teleporte globais ou de um jogador.
+    usage: /tpaignore [jogador]
+    aliases: [tpaignorar]
+    permission: onewaytpa.tpaignore
+  tpacancel:
+    description: Cancela teleporte pendente durante o delay.
+    usage: /tpacancel
+    aliases: [tpacancelar]
+    permission: onewaytpa.tpacancel
+  tpareload:
+    description: Recarrega a configuracao e mensagens do plugin.
+    usage: /tpareload
+    permission: onewaytpa.reload
+permissions:
+  onewaytpa.*:
+    description: Todas as permissoes do OneWayTPA.
+    default: op
+    children:
+      onewaytpa.tpa: true
+      onewaytpa.tpahere: true
+      onewaytpa.tpaccept: true
+      onewaytpa.tpadeny: true
+      onewaytpa.tpauto: true
+      onewaytpa.tpaauto: true
+      onewaytpa.tpaignore: true
+      onewaytpa.tpacancel: true
+      onewaytpa.reload: true
+  onewaytpa.use:
+    description: Permissoes basicas de uso do TPA.
+    default: true
+    children:
+      onewaytpa.tpa: true
+      onewaytpa.tpahere: true
+      onewaytpa.tpaccept: true
+      onewaytpa.tpadeny: true
+      onewaytpa.tpauto: true
+      onewaytpa.tpaauto: true
+      onewaytpa.tpaignore: true
+      onewaytpa.tpacancel: true
+  onewaytpa.tpa:
+    description: Permite usar /tpa.
+    default: true
+  onewaytpa.tpahere:
+    description: Permite usar /tpahere.
+    default: true
+  onewaytpa.tpaccept:
+    description: Permite usar /tpaccept.
+    default: true
+  onewaytpa.tpadeny:
+    description: Permite usar /tpadeny.
+    default: true
+  onewaytpa.tpauto:
+    description: Permite usar /tpauto.
+    default: true
+  onewaytpa.tpaauto:
+    description: Permite usar /tpaauto.
+    default: true
+  onewaytpa.tpaignore:
+    description: Permite usar /tpaignore.
+    default: true
+  onewaytpa.tpacancel:
+    description: Permite usar /tpacancel.
+    default: true
+  onewaytpa.reload:
+    description: Permite usar /tpareload.
+    default: op

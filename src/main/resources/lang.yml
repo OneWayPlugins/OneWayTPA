@@ -1,0 +1,61 @@
+messages:
+  prefix: "&6[OneWayTPA] &r"
+
+  players-only: "&cApenas jogadores podem usar este comando."
+  player-offline: "&cO jogador &e{player} &cnão está online."
+  cannot-self: "&cVocê não pode usar este comando em você mesmo."
+
+  usage-tpa: "&eUso: /tpa <jogador>"
+  usage-tpahere: "&eUso: /tpahere <jogador>"
+  usage-tpaccept: "&eUso: /tpaccept <jogador>"
+  usage-tpadeny: "&eUso: /tpadeny <jogador>"
+  usage-tpauto: "&eUso: /tpauto"
+  usage-tpaauto: "&eUso: /tpaauto <jogador>"
+  usage-tpaignore: "&eUso: /tpaignore [jogador]"
+  usage-tpacancel: "&eUso: /tpacancel"
+
+  cooldown-active: "&cAguarde &e{seconds}s &cpara enviar outro pedido."
+  request-ignored: "&c{player} está ignorando seus pedidos de teleporte."
+  request-not-found: "&cNenhum pedido pendente encontrado de &e{player}&c."
+  request-already-pending: "&cVocê já possui um pedido pendente para &e{player}&c."
+
+  request-sent-tpa: "&aPedido de /tpa enviado para &e{player}&a."
+  request-sent-tpahere: "&aPedido de /tpahere enviado para &e{player}&a."
+  request-received-tpa: "&e{player} &7quer teleportar até você."
+  request-received-tpahere: "&e{player} &7quer que você teleporte até ele."
+
+  click-instruction: "&7Clique para responder:"
+  click-accept: "&a[ACEITAR]"
+  click-accept-hover: "&7Aceitar pedido de &e{player}"
+  click-deny: "&c[RECUSAR]"
+  click-deny-hover: "&7Recusar pedido de &e{player}"
+
+  request-accepted-self: "&aVocê aceitou o pedido de &e{player}&a."
+  request-accepted-sender: "&a{player} aceitou seu pedido de teleporte."
+  request-denied-self: "&cVocê recusou o pedido de &e{player}&c."
+  request-denied-sender: "&c{player} recusou seu pedido de teleporte."
+  request-expired-sender: "&cSeu pedido para &e{player} &cexpirou."
+  request-expired-receiver: "&7O pedido de &e{player} &7expirou."
+
+  request-auto-accepted: "&a{player} está com auto-aceite ativo. Pedido aceito automaticamente."
+  request-auto-accepted-receiver: "&7Pedido de &e{player} &7foi aceito automaticamente."
+
+  tpauto-enabled: "&aAuto-aceite de /tpa ativado (não afeta /tpahere)."
+  tpauto-disabled: "&cAuto-aceite de /tpa desativado."
+  tpaauto-enabled: "&aAuto-aceite de /tpa ativado para &e{player}&a."
+  tpaauto-disabled: "&cAuto-aceite de /tpa desativado para &e{player}&c."
+
+  ignore-all-enabled: "&cAgora você ignora todos os pedidos de teleporte."
+  ignore-all-disabled: "&aVocê voltou a receber pedidos de teleporte."
+  ignore-player-enabled: "&cAgora você ignora pedidos de &e{player}&c."
+  ignore-player-disabled: "&aVocê voltou a receber pedidos de &e{player}&a."
+
+  teleport-delay: "&7Teleporte em &e{seconds}s&7. Use &e{command} &7para cancelar."
+  tpacancel-success: "&aTeleporte pendente cancelado."
+  tpacancel-none: "&cVocê não possui teleporte pendente para cancelar."
+  teleport-cancelled-by: "&cTeleporte cancelado por &e{player}&c."
+  teleport-cancelled-offline: "&cTeleporte cancelado: &e{player} &cficou offline."
+
+  teleport-success-self: "&aTeleporte concluído com sucesso."
+  teleport-success-other: "&a{player} foi teleportado com sucesso."
+  teleport-failed: "&cNão foi possível concluir o teleporte."

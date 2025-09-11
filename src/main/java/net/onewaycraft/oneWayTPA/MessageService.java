@@ -1,0 +1,65 @@
+package net.onewaycraft.oneWayTPA;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.Map;
+
+public final class MessageService {
+
+    private final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.legacyAmpersand();
+    private final YamlConfiguration langConfig;
+
+    public MessageService(JavaPlugin plugin) {
+        File langFile = new File(plugin.getDataFolder(), "lang.yml");
+        if (!langFile.exists()) {
+            plugin.saveResource("lang.yml", false);
+        }
+        this.langConfig = YamlConfiguration.loadConfiguration(langFile);
+    }
+
+    public void send(CommandSender target, String key) {
+        send(target, key, Collections.emptyMap());
+    }
+
+    public void send(CommandSender target, String key, Map<String, String> placeholders) {
+        target.sendMessage(withPrefix(key, placeholders));
+    }
+
+    public Component withPrefix(String key, Map<String, String> placeholders) {
+        return parseLegacy(raw("prefix") + raw(key), placeholders);
+    }
+
+    public Component noPrefix(String key, Map<String, String> placeholders) {
+        return parseLegacy(raw(key), placeholders);
+    }
+
+    public Component prefix() {
+        return legacySerializer.deserialize(raw("prefix"));
+    }
+
+    public Component parseLegacy(String legacy, Map<String, String> placeholders) {
+        return legacySerializer.deserialize(applyPlaceholders(legacy, placeholders));
+    }
+
+    private String raw(String key) {
+        String value = langConfig.getString("messages." + key);
+        if (value == null) {
+            return "&c[missing lang key: " + key + "] ";
+        }
+        return value;
+    }
+
+    private String applyPlaceholders(String input, Map<String, String> placeholders) {
+        String output = input;
+        for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+            output = output.replace("{" + entry.getKey() + "}", entry.getValue());
+        }
+        return output;
+    }
+}
