@@ -1,5 +1,7 @@
 package net.onewaycraft.oneWayTPA;
 
+import net.onewaycraft.oneWayTPA.api.OneWayTpaApiImpl;
+import net.onewaycraft.oneWayTPA.api.OneWayTpaProvider;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -16,6 +18,7 @@ public final class OneWayTPA extends JavaPlugin {
         PluginSettings settings = PluginSettings.fromConfig(getConfig());
         this.tpaService = new TpaService(this, messages, settings);
 
+        registerApi();
         registerCommands();
 
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
@@ -23,12 +26,14 @@ public final class OneWayTPA extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        OneWayTpaProvider.unregister();
         if (tpaService != null) {
             tpaService.shutdown();
         }
     }
 
     public void reload() {
+        OneWayTpaProvider.unregister();
         reloadConfig();
 
         this.messages = new MessageService(this);
@@ -39,11 +44,23 @@ public final class OneWayTPA extends JavaPlugin {
         }
         this.tpaService = new TpaService(this, messages, settings);
 
+        registerApi();
         registerCommands();
     }
 
     public TpaService getTpaService() {
         return tpaService;
+    }
+
+    private void registerApi() {
+        OneWayTpaApiImpl api = new OneWayTpaApiImpl(
+                tpaService,
+                tpaService.cooldownService(),
+                tpaService.preferenceService(),
+                tpaService.requestService(),
+                tpaService.pluginSettings()
+        );
+        OneWayTpaProvider.register(api);
     }
 
     private void registerCommands() {
