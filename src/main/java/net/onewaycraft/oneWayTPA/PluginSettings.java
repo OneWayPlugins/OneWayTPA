@@ -17,15 +17,18 @@ public final class PluginSettings {
 
     private final long requestExpireSeconds;
     private final long teleportDelaySeconds;
+    private final boolean teleportToLiveLocation;
     private final List<CooldownGroup> cooldownGroups;
     private final Map<String, String> commandAliases;
 
     public PluginSettings(long requestExpireSeconds,
                           long teleportDelaySeconds,
+                          boolean teleportToLiveLocation,
                           List<CooldownGroup> cooldownGroups,
                           Map<String, String> commandAliases) {
         this.requestExpireSeconds = Math.max(0L, requestExpireSeconds);
         this.teleportDelaySeconds = Math.max(0L, teleportDelaySeconds);
+        this.teleportToLiveLocation = teleportToLiveLocation;
         this.cooldownGroups = List.copyOf(cooldownGroups);
         this.commandAliases = Map.copyOf(commandAliases);
     }
@@ -33,9 +36,10 @@ public final class PluginSettings {
     public static PluginSettings fromConfig(FileConfiguration config) {
         long requestExpire = Math.max(0L, config.getLong("request-expire-seconds", 60L));
         long teleportDelay = Math.max(0L, config.getLong("teleport-delay-seconds", 5L));
+        boolean liveLocation = config.getBoolean("teleport-to-live-location", false);
         List<CooldownGroup> groups = loadCooldownGroups(config.getConfigurationSection("cooldown-groups"));
         Map<String, String> aliases = loadCommandAliases(config.getConfigurationSection("command-aliases"));
-        return new PluginSettings(requestExpire, teleportDelay, groups, aliases);
+        return new PluginSettings(requestExpire, teleportDelay, liveLocation, groups, aliases);
     }
 
     public long requestExpireSeconds() {
@@ -44,6 +48,10 @@ public final class PluginSettings {
 
     public long teleportDelaySeconds() {
         return teleportDelaySeconds;
+    }
+
+    public boolean teleportToLiveLocation() {
+        return teleportToLiveLocation;
     }
 
     public List<CooldownGroup> cooldownGroups() {

@@ -59,6 +59,7 @@ messages:
   teleport-success-self: "&aTeleport completed successfully."
   teleport-success-other: "&a{player} was teleported successfully."
   teleport-failed: "&cThe teleport could not be completed."
+  teleport-failed-destination-offline: "&cTeleport failed: the destination player is offline."
 
   reload-success: "&aConfiguration and messages reloaded."
 

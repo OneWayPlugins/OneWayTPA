@@ -5,6 +5,12 @@ request-expire-seconds: 60
 # During this window, /tpacancel can interrupt the teleport.
 teleport-delay-seconds: 5
 
+# When false (default), the destination is captured at /tpaccept time and is
+# unchanged even if the destination player moves during the warmup.
+# When true, the destination is re-read at the moment of teleport execution.
+# If the destination player is offline at execute time, the teleport fails.
+teleport-to-live-location: false
+
 # Cooldown groups for /tpa and /tpahere senders.
 # Order matters: the first group whose permission the player has wins.
 cooldown-groups:

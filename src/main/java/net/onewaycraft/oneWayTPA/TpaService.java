@@ -31,7 +31,7 @@ public final class TpaService {
         this.cooldowns = new CooldownService(settings.cooldownGroups());
         this.preferences = new PreferenceService(plugin);
         this.requests = new RequestService();
-        this.teleports = new TeleportService(plugin, messages, settings.teleportDelaySeconds());
+        this.teleports = new TeleportService(plugin, messages, settings);
     }
 
     public boolean sendRequest(Player sender, Player receiver, RequestType type) {
@@ -69,7 +69,9 @@ public final class TpaService {
 
             messages.send(sender, "request-auto-accepted", Map.of("player", receiver.getName()));
             messages.send(receiver, "request-auto-accepted-receiver", Map.of("player", sender.getName()));
-            teleports.schedule(virtualRequest, sender.getUniqueId(), sender.getName(), receiver.getLocation().clone());
+            teleports.schedule(virtualRequest,
+                    sender.getUniqueId(), sender.getName(),
+                    receiver.getUniqueId(), receiver.getLocation().clone());
             return true;
         }
 
@@ -109,11 +111,15 @@ public final class TpaService {
         messages.send(sender, "request-accepted-sender", Map.of("player", receiver.getName()));
 
         if (request.type() == RequestType.TPA) {
-            teleports.schedule(request, request.senderId(), request.senderName(), receiver.getLocation().clone());
+            teleports.schedule(request,
+                    request.senderId(), request.senderName(),
+                    receiver.getUniqueId(), receiver.getLocation().clone());
             return true;
         }
 
-        teleports.schedule(request, request.receiverId(), request.receiverName(), sender.getLocation().clone());
+        teleports.schedule(request,
+                request.receiverId(), request.receiverName(),
+                sender.getUniqueId(), sender.getLocation().clone());
         return true;
     }
 

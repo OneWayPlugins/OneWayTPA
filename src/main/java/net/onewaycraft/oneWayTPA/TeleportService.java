@@ -16,17 +16,23 @@ public final class TeleportService {
 
     private final Plugin plugin;
     private final MessageService messages;
+    private final PluginSettings settings;
     private final long delaySeconds;
     private final AtomicLong teleportIdCounter = new AtomicLong();
     private final Map<Long, PendingTeleport> pendingTeleports = new ConcurrentHashMap<>();
 
-    public TeleportService(Plugin plugin, MessageService messages, long delaySeconds) {
+    public TeleportService(Plugin plugin, MessageService messages, PluginSettings settings) {
         this.plugin = plugin;
         this.messages = messages;
-        this.delaySeconds = Math.max(0L, delaySeconds);
+        this.settings = settings;
+        this.delaySeconds = Math.max(0L, settings.teleportDelaySeconds());
     }
 
-    public void schedule(TeleportRequest request, UUID teleportedPlayerId, String teleportedPlayerName, Location destination) {
+    public void schedule(TeleportRequest request,
+                         UUID teleportedPlayerId,
+                         String teleportedPlayerName,
+                         UUID destinationOwnerId,
+                         Location destination) {
         PendingTeleport pending = new PendingTeleport(
                 teleportIdCounter.incrementAndGet(),
                 request.senderId(),
@@ -35,6 +41,7 @@ public final class TeleportService {
                 request.receiverName(),
                 teleportedPlayerId,
                 teleportedPlayerName,
+                destinationOwnerId,
                 destination.clone()
         );
 
@@ -112,22 +119,30 @@ public final class TeleportService {
             return;
         }
 
+        Location destination = resolveDestination(pending);
+        if (destination == null) {
+            notifyParticipants(pending, "teleport-failed-destination-offline",
+                    Map.of("player", pending.teleportedPlayerName()));
+            return;
+        }
+
         TpaTeleportEvent teleportEvent = new TpaTeleportEvent(
-                teleported, pending.requesterId(), pending.receiverId(), pending.destination());
+                teleported, pending.requesterId(), pending.receiverId(), destination);
         Bukkit.getPluginManager().callEvent(teleportEvent);
         if (teleportEvent.isCancelled()) {
             notifyParticipants(pending, "teleport-failed", Map.of("player", pending.teleportedPlayerName()));
             return;
         }
 
-        teleported.teleportAsync(pending.destination()).whenComplete((success, throwable) -> {
+        Location finalDestination = destination;
+        teleported.teleportAsync(finalDestination).whenComplete((success, throwable) -> {
             if (throwable != null || !Boolean.TRUE.equals(success)) {
                 notifyParticipants(pending, "teleport-failed", Map.of("player", pending.teleportedPlayerName()));
                 return;
             }
 
             TpaTeleportCompleteEvent completeEvent = new TpaTeleportCompleteEvent(
-                    teleported, pending.requesterId(), pending.receiverId(), pending.destination());
+                    teleported, pending.requesterId(), pending.receiverId(), finalDestination);
             completeEvent.callEvent();
 
             sendSuccessMessage(pending.requesterId(), pending.teleportedPlayerId(), pending.teleportedPlayerName());
@@ -135,6 +150,17 @@ public final class TeleportService {
                 sendSuccessMessage(pending.receiverId(), pending.teleportedPlayerId(), pending.teleportedPlayerName());
             }
         });
+    }
+
+    private Location resolveDestination(PendingTeleport pending) {
+        if (!settings.teleportToLiveLocation()) {
+            return pending.destination();
+        }
+        Player owner = Bukkit.getPlayer(pending.destinationOwnerId());
+        if (owner == null || !owner.isOnline()) {
+            return null;
+        }
+        return owner.getLocation().clone();
     }
 
     private void sendSuccessMessage(UUID recipientId, UUID teleportedId, String teleportedName) {
