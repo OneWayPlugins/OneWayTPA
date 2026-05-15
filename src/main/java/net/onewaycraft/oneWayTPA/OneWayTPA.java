@@ -5,10 +5,25 @@ import net.onewaycraft.oneWayTPA.api.OneWayTpaProvider;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+ * Entry point for the OneWayTPA plugin.
+ * <p>
+ * Lifecycle:
+ * <ul>
+ *   <li>{@code onEnable()} — loads settings, builds the service graph, exposes the public API
+ *       via {@link OneWayTpaProvider}, registers the command executors and the
+ *       runtime alias proxies from {@code config.yml}.</li>
+ *   <li>{@link #reload()} — re-reads {@code config.yml} and {@code lang.yml}, rebuilds the
+ *       service graph, re-registers commands and aliases. Note: this clears in-flight teleports
+ *       and pending requests (see {@code TpaService.shutdown()}). Document for operators.</li>
+ *   <li>{@code onDisable()} — unregisters aliases and shuts the service graph down.</li>
+ * </ul>
+ */
 public final class OneWayTPA extends JavaPlugin {
 
     private MessageService messages;
     private TpaService tpaService;
+    private AliasRegistrar aliasRegistrar;
 
     @Override
     public void onEnable() {
@@ -17,9 +32,11 @@ public final class OneWayTPA extends JavaPlugin {
         this.messages = new MessageService(this);
         PluginSettings settings = PluginSettings.fromConfig(getConfig());
         this.tpaService = new TpaService(this, messages, settings);
+        this.aliasRegistrar = new AliasRegistrar(this);
 
         registerApi();
         registerCommands();
+        aliasRegistrar.register(settings.commandAliases());
 
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
     }
@@ -27,6 +44,9 @@ public final class OneWayTPA extends JavaPlugin {
     @Override
     public void onDisable() {
         OneWayTpaProvider.unregister();
+        if (aliasRegistrar != null) {
+            aliasRegistrar.unregisterAll();
+        }
         if (tpaService != null) {
             tpaService.shutdown();
         }
@@ -34,6 +54,9 @@ public final class OneWayTPA extends JavaPlugin {
 
     public void reload() {
         OneWayTpaProvider.unregister();
+        if (aliasRegistrar != null) {
+            aliasRegistrar.unregisterAll();
+        }
         reloadConfig();
 
         this.messages = new MessageService(this);
@@ -46,6 +69,7 @@ public final class OneWayTPA extends JavaPlugin {
 
         registerApi();
         registerCommands();
+        aliasRegistrar.register(settings.commandAliases());
     }
 
     public TpaService getTpaService() {

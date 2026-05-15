@@ -17,3 +17,13 @@ cooldown-groups:
   default:
     permission: ""
     seconds: 30
+
+# Optional command aliases. Each entry maps alias -> canonical command name.
+# Default values preserve the Portuguese aliases shipped with OneWayTPA 1.x.
+# Comment out or delete any entry to disable that alias.
+# Add your own entries to provide additional shortcuts (e.g. mytpa: tpa).
+command-aliases:
+  tpaaqui: tpahere
+  tparecusar: tpadeny
+  tpaignorar: tpaignore
+  tpacancelar: tpacancel
