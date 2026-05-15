@@ -49,6 +49,12 @@ cancel-on-move: true
 # Default true: matches what most players expect from Essentials-style TPA.
 accept-most-recent-without-args: true
 
+# Seconds of invulnerability granted after a successful teleport. All
+# incoming damage (PvP, mobs, fall, lava, void, etc.) is cancelled for the
+# teleported player during this window. Set to 0 to disable. Default 0 to
+# preserve 2.3 behaviour.
+post-teleport-invulnerability-seconds: 0
+
 # When true, OneWayTPA logs admin-facing INFO lines for request flow events
 # (sent, accepted, denied, expired, retracted, teleported, cancelled).
 # Off by default to keep the console clean. Flip to true when debugging.

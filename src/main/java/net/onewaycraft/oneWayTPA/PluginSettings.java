@@ -25,6 +25,7 @@ public final class PluginSettings {
     private final boolean autoAcceptIncludesTpahere;
     private final boolean cancelOnMove;
     private final boolean acceptMostRecentWithoutArgs;
+    private final long postTeleportInvulnerabilitySeconds;
     private final boolean logEvents;
     private final List<CooldownGroup> cooldownGroups;
     private final Map<String, String> commandAliases;
@@ -39,6 +40,7 @@ public final class PluginSettings {
                           boolean autoAcceptIncludesTpahere,
                           boolean cancelOnMove,
                           boolean acceptMostRecentWithoutArgs,
+                          long postTeleportInvulnerabilitySeconds,
                           boolean logEvents,
                           List<CooldownGroup> cooldownGroups,
                           Map<String, String> commandAliases) {
@@ -52,6 +54,7 @@ public final class PluginSettings {
         this.autoAcceptIncludesTpahere = autoAcceptIncludesTpahere;
         this.cancelOnMove = cancelOnMove;
         this.acceptMostRecentWithoutArgs = acceptMostRecentWithoutArgs;
+        this.postTeleportInvulnerabilitySeconds = Math.max(0L, postTeleportInvulnerabilitySeconds);
         this.logEvents = logEvents;
         this.cooldownGroups = List.copyOf(cooldownGroups);
         this.commandAliases = Map.copyOf(commandAliases);
@@ -68,12 +71,13 @@ public final class PluginSettings {
         boolean autoAcceptTpahere = config.getBoolean("auto-accept-includes-tpahere", false);
         boolean cancelOnMove = config.getBoolean("cancel-on-move", true);
         boolean acceptMostRecent = config.getBoolean("accept-most-recent-without-args", true);
+        long invulnerabilitySeconds = Math.max(0L, config.getLong("post-teleport-invulnerability-seconds", 0L));
         boolean logEvents = config.getBoolean("log-events", false);
         List<CooldownGroup> groups = loadCooldownGroups(config.getConfigurationSection("cooldown-groups"));
         Map<String, String> aliases = loadCommandAliases(config.getConfigurationSection("command-aliases"));
         return new PluginSettings(requestExpire, teleportDelay, liveLocation,
                 retractPending, cancelWarmup, resetOnAccept, resetOnDeny, autoAcceptTpahere,
-                cancelOnMove, acceptMostRecent, logEvents, groups, aliases);
+                cancelOnMove, acceptMostRecent, invulnerabilitySeconds, logEvents, groups, aliases);
     }
 
     public long requestExpireSeconds() {
@@ -114,6 +118,10 @@ public final class PluginSettings {
 
     public boolean acceptMostRecentWithoutArgs() {
         return acceptMostRecentWithoutArgs;
+    }
+
+    public long postTeleportInvulnerabilitySeconds() {
+        return postTeleportInvulnerabilitySeconds;
     }
 
     public boolean logEvents() {

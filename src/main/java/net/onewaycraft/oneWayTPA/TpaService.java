@@ -36,6 +36,7 @@ public final class TpaService {
     private final CooldownService cooldowns;
     private final PreferenceService preferences;
     private final RequestService requests;
+    private final InvulnerabilityService invulnerability;
     private final TeleportService teleports;
 
     public TpaService(OneWayTPA plugin, MessageService messages, PluginSettings settings) {
@@ -45,7 +46,8 @@ public final class TpaService {
         this.cooldowns = new CooldownService(settings.cooldownGroups());
         this.preferences = new PreferenceService(plugin);
         this.requests = new RequestService();
-        this.teleports = new TeleportService(plugin, messages, settings);
+        this.invulnerability = new InvulnerabilityService();
+        this.teleports = new TeleportService(plugin, messages, settings, invulnerability);
     }
 
     public boolean sendRequest(Player sender, Player receiver, RequestType type) {
@@ -246,6 +248,10 @@ public final class TpaService {
         return requests;
     }
 
+    InvulnerabilityService invulnerabilityService() {
+        return invulnerability;
+    }
+
     PluginSettings pluginSettings() {
         return settings;
     }
@@ -254,6 +260,7 @@ public final class TpaService {
         teleports.cancelByParticipantSilently(playerId);
         requests.removeByPlayer(playerId);
         cooldowns.removePlayer(playerId);
+        invulnerability.remove(playerId);
     }
 
     public void handlePlayerMoved(Player player) {
@@ -267,6 +274,7 @@ public final class TpaService {
         teleports.shutdown();
         requests.clear();
         cooldowns.clear();
+        invulnerability.clear();
     }
 
     private void sendRequestMessages(Player sender, Player receiver, RequestType type) {

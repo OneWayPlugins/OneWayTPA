@@ -31,14 +31,17 @@ public final class TeleportService {
     private final Plugin plugin;
     private final MessageService messages;
     private final PluginSettings settings;
+    private final InvulnerabilityService invulnerability;
     private final long delaySeconds;
     private final AtomicLong teleportIdCounter = new AtomicLong();
     private final Map<Long, PendingTeleport> pendingTeleports = new ConcurrentHashMap<>();
 
-    public TeleportService(Plugin plugin, MessageService messages, PluginSettings settings) {
+    public TeleportService(Plugin plugin, MessageService messages, PluginSettings settings,
+                           InvulnerabilityService invulnerability) {
         this.plugin = plugin;
         this.messages = messages;
         this.settings = settings;
+        this.invulnerability = invulnerability;
         this.delaySeconds = Math.max(0L, settings.teleportDelaySeconds());
     }
 
@@ -202,6 +205,8 @@ public final class TeleportService {
                 return;
             }
 
+            grantInvulnerability(teleported);
+
             TpaTeleportCompleteEvent completeEvent = new TpaTeleportCompleteEvent(
                     teleported, pending.requesterId(), pending.receiverId(), finalDestination);
             completeEvent.callEvent();
@@ -211,6 +216,16 @@ public final class TeleportService {
                 sendSuccessMessage(pending.receiverId(), pending.teleportedPlayerId(), pending.teleportedPlayerName());
             }
         });
+    }
+
+    private void grantInvulnerability(Player teleported) {
+        long seconds = settings.postTeleportInvulnerabilitySeconds();
+        if (seconds <= 0L) {
+            return;
+        }
+        invulnerability.grant(teleported.getUniqueId(), seconds);
+        messages.send(teleported, "teleport-invulnerability-granted",
+                Map.of("seconds", String.valueOf(seconds)));
     }
 
     private Location resolveDestination(PendingTeleport pending) {

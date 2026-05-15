@@ -40,6 +40,7 @@ public final class OneWayTPA extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerMoveListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerDamageListener(this), this);
     }
 
     @Override

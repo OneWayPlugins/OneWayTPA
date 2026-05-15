@@ -68,6 +68,7 @@ messages:
   teleport-success-other: "&a{player} was teleported successfully."
   teleport-failed: "&cThe teleport could not be completed."
   teleport-failed-destination-offline: "&cTeleport failed: the destination player is offline."
+  teleport-invulnerability-granted: "&aYou have &e{seconds}s &aof post-teleport invulnerability."
 
   reload-success: "&aConfiguration and messages reloaded."
 
