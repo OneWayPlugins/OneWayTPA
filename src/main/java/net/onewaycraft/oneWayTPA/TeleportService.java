@@ -1,5 +1,8 @@
 package net.onewaycraft.oneWayTPA;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.onewaycraft.oneWayTPA.api.event.TpaTeleportCompleteEvent;
 import net.onewaycraft.oneWayTPA.api.event.TpaTeleportEvent;
 import org.bukkit.Bukkit;
@@ -64,17 +67,34 @@ public final class TeleportService {
         }
 
         pendingTeleports.put(pending.id(), pending);
-        notifyParticipants(
-                pending,
-                "teleport-delay",
-                Map.of("seconds", String.valueOf(delaySeconds), "command", "/tpacancel")
-        );
+        notifyTeleportDelay(pending, delaySeconds);
 
         plugin.getServer().getGlobalRegionScheduler().runDelayed(
                 plugin,
                 task -> runScheduledTeleport(pending.id()),
                 delaySeconds * TICKS_PER_SECOND
         );
+    }
+
+    private void notifyTeleportDelay(PendingTeleport pending, long delaySeconds) {
+        Map<String, String> placeholders = Map.of("seconds", String.valueOf(delaySeconds));
+        Component message = messages.withPrefix("teleport-delay", placeholders);
+        if (settings.cancelWarmupEnabled()) {
+            Component cancelButton = messages.noPrefix("click-cancel", Map.of())
+                    .clickEvent(ClickEvent.runCommand("/tpacancel"))
+                    .hoverEvent(HoverEvent.showText(messages.noPrefix("click-cancel-hover", Map.of())));
+            message = message.append(Component.space()).append(cancelButton);
+        }
+
+        Player requester = Bukkit.getPlayer(pending.requesterId());
+        if (requester != null && requester.isOnline()) {
+            requester.sendMessage(message);
+        }
+        Player receiver = Bukkit.getPlayer(pending.receiverId());
+        if (receiver != null && receiver.isOnline()
+                && !receiver.getUniqueId().equals(pending.requesterId())) {
+            receiver.sendMessage(message);
+        }
     }
 
     public boolean cancelByParticipant(Player actor) {

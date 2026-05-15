@@ -50,7 +50,9 @@ messages:
   ignore-player-enabled: "&cYou are now ignoring requests from &e{player}&c."
   ignore-player-disabled: "&aYou are no longer ignoring requests from &e{player}&a."
 
-  teleport-delay: "&7Teleporting in &e{seconds}s&7. Use &e{command} &7to cancel."
+  teleport-delay: "&7Teleporting in &e{seconds}s&7."
+  click-cancel: "&c[CANCEL]"
+  click-cancel-hover: "&7Cancel this teleport"
   tpacancel-success: "&aPending teleport cancelled."
   tpacancel-none: "&cYou have no pending teleport to cancel."
   tpacancel-disabled: "&c/tpacancel has been disabled by the administrator."
