@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-05-15
+
+### Added
+
+- `post-teleport-invulnerability-seconds` config integer (default `0` = disabled). When set to a positive value, the teleported player is protected from all incoming damage for that many seconds after a successful teleport. Covers PvP, mob attacks, fall damage, lava, void, and any other source that fires `EntityDamageEvent`.
+- New `InvulnerabilityService` tracks per-player expiry timestamps. `grant()` uses `Map.merge` with `Math::max` so a second teleport during an active window never shortens the protection.
+- New `PlayerDamageListener` cancels `EntityDamageEvent` at `EventPriority.HIGH` with `ignoreCancelled = true` for players inside the window.
+- `teleport-invulnerability-granted` lang key (with `{seconds}` placeholder) sent to the teleported player on grant when the window is enabled.
+
+### Changed
+
+- `TeleportService` constructor now accepts an `InvulnerabilityService` so it can grant the window after a successful `teleportAsync`.
+- `TpaService.handlePlayerQuit` clears the invulnerability map entry for the disconnecting player.
+- `TpaService.shutdown` clears the full invulnerability map.
+
+### Migrating from 2.3
+
+- Default `post-teleport-invulnerability-seconds: 0` preserves the 2.3 behaviour. Opt in by setting any positive integer.
+
 ## [2.3.0] - 2026-05-15
 
 ### Added

@@ -1,7 +1,7 @@
 # OneWayTPA
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.4.0-blue.svg)](CHANGELOG.md)
 [![Paper](https://img.shields.io/badge/Paper-1.21.x-orange.svg)](https://papermc.io)
 [![Folia](https://img.shields.io/badge/Folia-supported-green.svg)](https://papermc.io/software/folia)
 [![Java](https://img.shields.io/badge/Java-21-red.svg)](https://adoptium.net)
@@ -44,7 +44,7 @@ Windows:
 .\gradlew.bat build
 ```
 
-The resulting JAR is at `build/libs/OneWayTPA-2.3.0.jar`.
+The resulting JAR is at `build/libs/OneWayTPA-2.4.0.jar`.
 
 ## Commands
 
@@ -129,6 +129,10 @@ cancel-on-move: true
 # Default true.
 accept-most-recent-without-args: true
 
+# Seconds of post-teleport invulnerability. All incoming damage is cancelled
+# for the teleported player during this window. 0 disables. Default 0.
+post-teleport-invulnerability-seconds: 0
+
 # When true, OneWayTPA logs admin-facing INFO lines for request flow events.
 log-events: false
 
@@ -202,6 +206,10 @@ By default (`cancel-on-move: true`), the teleport is aborted if the player being
 
 When a teleport's warmup begins, both the requester and the receiver receive the `teleport-delay` message with an appended clickable `[CANCEL]` button that runs `/tpacancel` for the clicker. The button is only rendered when `tpacancel.cancel-warmup` is true, so a disabled command never leaves a non-functional button behind.
 
+### Post-teleport invulnerability
+
+Set `post-teleport-invulnerability-seconds` to any positive integer to grant the teleported player a brief damage-immunity window after the teleport completes. Useful for preventing ambush kills right after a `/tpa` and for letting players load the new area without taking damage. The window covers **all** damage sources — PvP, mobs, fall, lava, void — and is reset to its full duration if the player teleports again before the previous window expires. Defaults to `0` (disabled) to preserve the existing behaviour.
+
 ## Public API
 
 External plugins can integrate via `OneWayTpaApi`. Add a `depend: [OneWayTPA]` or `softdepend: [OneWayTPA]` entry to your own `plugin.yml`.
@@ -227,6 +235,13 @@ int retracted = api.retractPendingRequests(sender);
 | `TpaRequestExpireEvent` | no | After a pending request expires |
 | `TpaTeleportEvent` | yes | Just before the warmup teleport is executed |
 | `TpaTeleportCompleteEvent` | no | After a successful teleport (may fire async) |
+
+## Migrating from 2.3
+
+`2.4.0` is purely additive on top of `2.3.0`:
+
+- **`post-teleport-invulnerability-seconds: 0` is the new default.** Behaviour is unchanged unless you set the value to a positive integer to enable the feature.
+- No lang-key or permission changes.
 
 ## Migrating from 2.2
 
