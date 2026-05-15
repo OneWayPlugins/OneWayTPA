@@ -1,52 +1,51 @@
 name: OneWayTPA
-version: '1.0.0'
+version: '${version}'
 main: net.onewaycraft.oneWayTPA.OneWayTPA
 api-version: '1.21'
 folia-supported: true
+description: One-way TPA plugin for Paper and Folia. Players can request teleports that resolve in one direction with a configurable warmup.
+authors: [Lucas Santoro]
+website: https://github.com/lucas-santoro/OneWayTPA
 commands:
   tpa:
-    description: Envia um pedido para teleportar ate outro jogador.
-    usage: /tpa <jogador>
+    description: Send a request to teleport to another player.
+    usage: /tpa <player>
     permission: onewaytpa.tpa
   tpahere:
-    description: Envia um pedido para trazer outro jogador ate voce.
-    usage: /tpahere <jogador>
-    aliases: [tpaaqui]
+    description: Send a request to bring another player to you.
+    usage: /tpahere <player>
     permission: onewaytpa.tpahere
   tpaccept:
-    description: Aceita um pedido de teleporte.
-    usage: /tpaccept <jogador>
+    description: Accept a pending teleport request.
+    usage: /tpaccept <player>
     permission: onewaytpa.tpaccept
   tpadeny:
-    description: Recusa um pedido de teleporte.
-    usage: /tpadeny <jogador>
-    aliases: [tparecusar]
+    description: Deny a pending teleport request.
+    usage: /tpadeny <player>
     permission: onewaytpa.tpadeny
   tpauto:
-    description: Ativa ou desativa auto-aceite para pedidos /tpa.
+    description: Toggle auto-accept for /tpa requests.
     usage: /tpauto
     permission: onewaytpa.tpauto
   tpaauto:
-    description: Ativa ou desativa auto-aceite de /tpa para um jogador especifico.
-    usage: /tpaauto <jogador>
+    description: Toggle auto-accept of /tpa for a specific player.
+    usage: /tpaauto <player>
     permission: onewaytpa.tpaauto
   tpaignore:
-    description: Ignora pedidos de teleporte globais ou de um jogador.
-    usage: /tpaignore [jogador]
-    aliases: [tpaignorar]
+    description: Ignore teleport requests globally or from a specific player.
+    usage: /tpaignore [player]
     permission: onewaytpa.tpaignore
   tpacancel:
-    description: Cancela teleporte pendente durante o delay.
+    description: Cancel a pending teleport during the warmup window.
     usage: /tpacancel
-    aliases: [tpacancelar]
     permission: onewaytpa.tpacancel
   tpareload:
-    description: Recarrega a configuracao e mensagens do plugin.
+    description: Reload OneWayTPA configuration and messages.
     usage: /tpareload
     permission: onewaytpa.reload
 permissions:
   onewaytpa.*:
-    description: Todas as permissoes do OneWayTPA.
+    description: All OneWayTPA permissions.
     default: op
     children:
       onewaytpa.tpa: true
@@ -59,7 +58,7 @@ permissions:
       onewaytpa.tpacancel: true
       onewaytpa.reload: true
   onewaytpa.use:
-    description: Permissoes basicas de uso do TPA.
+    description: Basic TPA usage permissions.
     default: true
     children:
       onewaytpa.tpa: true
@@ -71,29 +70,29 @@ permissions:
       onewaytpa.tpaignore: true
       onewaytpa.tpacancel: true
   onewaytpa.tpa:
-    description: Permite usar /tpa.
+    description: Allows using /tpa.
     default: true
   onewaytpa.tpahere:
-    description: Permite usar /tpahere.
+    description: Allows using /tpahere.
     default: true
   onewaytpa.tpaccept:
-    description: Permite usar /tpaccept.
+    description: Allows using /tpaccept.
     default: true
   onewaytpa.tpadeny:
-    description: Permite usar /tpadeny.
+    description: Allows using /tpadeny.
     default: true
   onewaytpa.tpauto:
-    description: Permite usar /tpauto.
+    description: Allows using /tpauto.
     default: true
   onewaytpa.tpaauto:
-    description: Permite usar /tpaauto.
+    description: Allows using /tpaauto.
     default: true
   onewaytpa.tpaignore:
-    description: Permite usar /tpaignore.
+    description: Allows using /tpaignore.
     default: true
   onewaytpa.tpacancel:
-    description: Permite usar /tpacancel.
+    description: Allows using /tpacancel.
     default: true
   onewaytpa.reload:
-    description: Permite usar /tpareload.
+    description: Allows using /tpareload.
     default: op

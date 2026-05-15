@@ -1,18 +1,18 @@
-# Tempo em segundos para expirar um pedido pendente.
+# How long a pending /tpa or /tpahere request stays valid before expiring.
 request-expire-seconds: 60
 
-# Tempo em segundos entre aceitar e executar o teleporte.
-# Durante esse tempo, /tpacancel pode cancelar.
+# Delay between /tpaccept and the actual teleport.
+# During this window, /tpacancel can interrupt the teleport.
 teleport-delay-seconds: 5
 
-# Cooldown de envio por grupo.
-# A ordem importa: o primeiro grupo com permissao correspondente sera usado.
+# Cooldown groups for /tpa and /tpahere senders.
+# Order matters: the first group whose permission the player has wins.
 cooldown-groups:
   vip:
     permission: "onewaytpa.cooldown.vip"
     seconds: 10
-  membro:
-    permission: "onewaytpa.cooldown.membro"
+  member:
+    permission: "onewaytpa.cooldown.member"
     seconds: 20
   default:
     permission: ""

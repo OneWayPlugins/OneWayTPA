@@ -52,6 +52,10 @@ public final class OneWayTPA extends JavaPlugin {
         return tpaService;
     }
 
+    public MessageService getMessages() {
+        return messages;
+    }
+
     private void registerApi() {
         OneWayTpaApiImpl api = new OneWayTpaApiImpl(
                 tpaService,

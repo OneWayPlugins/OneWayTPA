@@ -15,7 +15,7 @@ public final class ReloadCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         plugin.reload();
-        sender.sendMessage("§a[OneWayTPA] Configuração e mensagens recarregadas.");
+        plugin.getMessages().send(sender, "reload-success");
         return true;
     }
 }
