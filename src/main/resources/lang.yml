@@ -17,6 +17,7 @@ messages:
   request-ignored: "&c{player} is ignoring your teleport requests."
   request-not-found: "&cNo pending request found from &e{player}&c."
   request-already-pending: "&cYou already have a pending request for &e{player}&c."
+  no-pending-requests: "&cYou have no pending teleport requests."
 
   request-sent-tpa: "&aTeleport request sent to &e{player}&a."
   request-sent-tpahere: "&aTeleport-here request sent to &e{player}&a."

@@ -104,6 +104,20 @@ public final class RequestService {
         return receiverRequests != null && receiverRequests.containsKey(senderId);
     }
 
+    public String mostRecentSenderName(UUID receiverId) {
+        Map<UUID, TeleportRequest> receiverRequests = pendingRequests.get(receiverId);
+        if (receiverRequests == null || receiverRequests.isEmpty()) {
+            return null;
+        }
+        TeleportRequest newest = null;
+        for (TeleportRequest request : receiverRequests.values()) {
+            if (newest == null || request.id() > newest.id()) {
+                newest = request;
+            }
+        }
+        return newest == null ? null : newest.senderName();
+    }
+
     public int incomingPendingCount(UUID receiverId) {
         Map<UUID, TeleportRequest> receiverRequests = pendingRequests.get(receiverId);
         return receiverRequests == null ? 0 : receiverRequests.size();

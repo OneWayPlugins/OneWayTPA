@@ -24,6 +24,7 @@ public final class PluginSettings {
     private final boolean resetCooldownOnDeny;
     private final boolean autoAcceptIncludesTpahere;
     private final boolean cancelOnMove;
+    private final boolean acceptMostRecentWithoutArgs;
     private final boolean logEvents;
     private final List<CooldownGroup> cooldownGroups;
     private final Map<String, String> commandAliases;
@@ -37,6 +38,7 @@ public final class PluginSettings {
                           boolean resetCooldownOnDeny,
                           boolean autoAcceptIncludesTpahere,
                           boolean cancelOnMove,
+                          boolean acceptMostRecentWithoutArgs,
                           boolean logEvents,
                           List<CooldownGroup> cooldownGroups,
                           Map<String, String> commandAliases) {
@@ -49,6 +51,7 @@ public final class PluginSettings {
         this.resetCooldownOnDeny = resetCooldownOnDeny;
         this.autoAcceptIncludesTpahere = autoAcceptIncludesTpahere;
         this.cancelOnMove = cancelOnMove;
+        this.acceptMostRecentWithoutArgs = acceptMostRecentWithoutArgs;
         this.logEvents = logEvents;
         this.cooldownGroups = List.copyOf(cooldownGroups);
         this.commandAliases = Map.copyOf(commandAliases);
@@ -64,12 +67,13 @@ public final class PluginSettings {
         boolean resetOnDeny = config.getBoolean("reset-cooldown-on-deny", true);
         boolean autoAcceptTpahere = config.getBoolean("auto-accept-includes-tpahere", false);
         boolean cancelOnMove = config.getBoolean("cancel-on-move", true);
+        boolean acceptMostRecent = config.getBoolean("accept-most-recent-without-args", true);
         boolean logEvents = config.getBoolean("log-events", false);
         List<CooldownGroup> groups = loadCooldownGroups(config.getConfigurationSection("cooldown-groups"));
         Map<String, String> aliases = loadCommandAliases(config.getConfigurationSection("command-aliases"));
         return new PluginSettings(requestExpire, teleportDelay, liveLocation,
                 retractPending, cancelWarmup, resetOnAccept, resetOnDeny, autoAcceptTpahere,
-                cancelOnMove, logEvents, groups, aliases);
+                cancelOnMove, acceptMostRecent, logEvents, groups, aliases);
     }
 
     public long requestExpireSeconds() {
@@ -106,6 +110,10 @@ public final class PluginSettings {
 
     public boolean cancelOnMove() {
         return cancelOnMove;
+    }
+
+    public boolean acceptMostRecentWithoutArgs() {
+        return acceptMostRecentWithoutArgs;
     }
 
     public boolean logEvents() {

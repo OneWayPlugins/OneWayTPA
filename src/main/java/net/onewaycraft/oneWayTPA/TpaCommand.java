@@ -82,25 +82,39 @@ public final class TpaCommand implements CommandExecutor, TabCompleter {
     }
 
     private void handleAccept(Player receiver, String[] args) {
-        if (args.length != 1) {
-            messages.send(receiver, "usage-tpaccept");
+        String senderName = resolveTargetSender(receiver, args, "usage-tpaccept");
+        if (senderName == null) {
             return;
         }
-
-        if (!service.acceptRequest(receiver, args[0])) {
-            messages.send(receiver, "request-not-found", Map.of("player", args[0]));
+        if (!service.acceptRequest(receiver, senderName)) {
+            messages.send(receiver, "request-not-found", Map.of("player", senderName));
         }
     }
 
     private void handleDeny(Player receiver, String[] args) {
-        if (args.length != 1) {
-            messages.send(receiver, "usage-tpadeny");
+        String senderName = resolveTargetSender(receiver, args, "usage-tpadeny");
+        if (senderName == null) {
             return;
         }
-
-        if (!service.denyRequest(receiver, args[0])) {
-            messages.send(receiver, "request-not-found", Map.of("player", args[0]));
+        if (!service.denyRequest(receiver, senderName)) {
+            messages.send(receiver, "request-not-found", Map.of("player", senderName));
         }
+    }
+
+    private String resolveTargetSender(Player receiver, String[] args, String usageKey) {
+        if (args.length == 1) {
+            return args[0];
+        }
+        if (args.length == 0 && service.pluginSettings().acceptMostRecentWithoutArgs()) {
+            String mostRecent = service.mostRecentPendingSenderName(receiver);
+            if (mostRecent == null) {
+                messages.send(receiver, "no-pending-requests");
+                return null;
+            }
+            return mostRecent;
+        }
+        messages.send(receiver, usageKey);
+        return null;
     }
 
     private void handleTpAuto(Player player, String[] args) {

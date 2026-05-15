@@ -230,6 +230,10 @@ public final class TpaService {
         return requests.pendingSenders(receiver.getUniqueId());
     }
 
+    public String mostRecentPendingSenderName(Player receiver) {
+        return requests.mostRecentSenderName(receiver.getUniqueId());
+    }
+
     CooldownService cooldownService() {
         return cooldowns;
     }
