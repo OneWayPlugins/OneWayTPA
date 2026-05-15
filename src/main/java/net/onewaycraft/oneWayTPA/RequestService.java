@@ -108,6 +108,20 @@ public final class RequestService {
         return count;
     }
 
+    public List<TeleportRequest> removeBySender(UUID senderId) {
+        List<TeleportRequest> removed = new ArrayList<>();
+        for (Map.Entry<UUID, Map<UUID, TeleportRequest>> entry : pendingRequests.entrySet()) {
+            UUID receiverId = entry.getKey();
+            Map<UUID, TeleportRequest> inner = entry.getValue();
+            TeleportRequest request = inner.remove(senderId);
+            if (request != null) {
+                removed.add(request);
+                cleanupIfEmpty(receiverId, inner);
+            }
+        }
+        return removed;
+    }
+
     public void removeByPlayer(UUID playerId) {
         pendingRequests.remove(playerId);
 

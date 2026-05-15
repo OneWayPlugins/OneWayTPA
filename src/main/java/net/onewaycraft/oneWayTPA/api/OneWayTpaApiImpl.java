@@ -52,6 +52,11 @@ public final class OneWayTpaApiImpl implements OneWayTpaApi {
     }
 
     @Override
+    public int retractPendingRequests(Player sender) {
+        return tpaService.retractOwnPendingRequests(sender);
+    }
+
+    @Override
     public List<String> getPendingRequestSenders(Player receiver) {
         return tpaService.pendingSenderNames(receiver);
     }

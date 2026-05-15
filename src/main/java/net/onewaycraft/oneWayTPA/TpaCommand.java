@@ -160,10 +160,31 @@ public final class TpaCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
-        if (service.cancelPendingTeleport(player)) {
+        PluginSettings settings = service.pluginSettings();
+        boolean retractEnabled = settings.retractPendingEnabled();
+        boolean cancelWarmupEnabled = settings.cancelWarmupEnabled();
+
+        if (!retractEnabled && !cancelWarmupEnabled) {
+            messages.send(player, "tpacancel-disabled");
+            return;
+        }
+
+        if (retractEnabled) {
+            int retracted = service.retractOwnPendingRequests(player);
+            if (retracted > 0) {
+                messages.send(player, "tpacancel-retract-success",
+                        Map.of("count", String.valueOf(retracted)));
+                messages.send(player, "request-retracted-self",
+                        Map.of("count", String.valueOf(retracted)));
+                return;
+            }
+        }
+
+        if (cancelWarmupEnabled && service.cancelPendingTeleport(player)) {
             messages.send(player, "tpacancel-success");
             return;
         }
+
         messages.send(player, "tpacancel-none");
     }
 

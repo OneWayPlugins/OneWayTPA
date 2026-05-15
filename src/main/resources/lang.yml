@@ -53,8 +53,13 @@ messages:
   teleport-delay: "&7Teleporting in &e{seconds}s&7. Use &e{command} &7to cancel."
   tpacancel-success: "&aPending teleport cancelled."
   tpacancel-none: "&cYou have no pending teleport to cancel."
+  tpacancel-disabled: "&c/tpacancel has been disabled by the administrator."
+  tpacancel-retract-success: "&aRetracted &e{count} &apending teleport request(s)."
   teleport-cancelled-by: "&cTeleport cancelled by &e{player}&c."
   teleport-cancelled-offline: "&cTeleport cancelled: &e{player} &cwent offline."
+
+  request-retracted-self: "&7You retracted &e{count} &7outgoing teleport request(s)."
+  request-retracted-by-sender: "&7{player} &7retracted their teleport request."
 
   teleport-success-self: "&aTeleport completed successfully."
   teleport-success-other: "&a{player} was teleported successfully."

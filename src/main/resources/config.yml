@@ -11,6 +11,17 @@ teleport-delay-seconds: 5
 # If the destination player is offline at execute time, the teleport fails.
 teleport-to-live-location: false
 
+# /tpacancel behaviour. Both flags are independent. When both are off, /tpacancel
+# is fully disabled and shows the tpacancel-disabled message.
+tpacancel:
+  # When true, the sender can /tpacancel to retract all their own still-pending,
+  # not-yet-accepted outgoing requests (Essentials-style sender retract).
+  retract-pending: true
+
+  # When true, any participant can /tpacancel during the warmup window to cancel
+  # the in-flight teleport (original 1.x behaviour).
+  cancel-warmup: true
+
 # Cooldown groups for /tpa and /tpahere senders.
 # Order matters: the first group whose permission the player has wins.
 cooldown-groups:

@@ -62,6 +62,20 @@ public interface OneWayTpaApi {
      */
     boolean cancelPendingTeleport(Player player);
 
+    /**
+     * Retracts all still-pending outgoing teleport requests from the given sender.
+     * Fires {@link net.onewaycraft.oneWayTPA.api.event.TpaRequestRetractEvent} once per
+     * retracted request. Notifies online receivers via the {@code request-retracted-by-sender}
+     * lang key.
+     * <p>
+     * Unlike {@link #cancelPendingTeleport}, this only touches requests that have not been
+     * accepted yet — it does not interrupt an in-flight teleport during the warmup.
+     *
+     * @param sender the player retracting their own pending requests
+     * @return the number of requests that were retracted (0 if none were pending)
+     */
+    int retractPendingRequests(Player sender);
+
     // ========================
     //  Query
     // ========================

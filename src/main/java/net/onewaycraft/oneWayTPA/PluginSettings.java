@@ -18,17 +18,23 @@ public final class PluginSettings {
     private final long requestExpireSeconds;
     private final long teleportDelaySeconds;
     private final boolean teleportToLiveLocation;
+    private final boolean retractPendingEnabled;
+    private final boolean cancelWarmupEnabled;
     private final List<CooldownGroup> cooldownGroups;
     private final Map<String, String> commandAliases;
 
     public PluginSettings(long requestExpireSeconds,
                           long teleportDelaySeconds,
                           boolean teleportToLiveLocation,
+                          boolean retractPendingEnabled,
+                          boolean cancelWarmupEnabled,
                           List<CooldownGroup> cooldownGroups,
                           Map<String, String> commandAliases) {
         this.requestExpireSeconds = Math.max(0L, requestExpireSeconds);
         this.teleportDelaySeconds = Math.max(0L, teleportDelaySeconds);
         this.teleportToLiveLocation = teleportToLiveLocation;
+        this.retractPendingEnabled = retractPendingEnabled;
+        this.cancelWarmupEnabled = cancelWarmupEnabled;
         this.cooldownGroups = List.copyOf(cooldownGroups);
         this.commandAliases = Map.copyOf(commandAliases);
     }
@@ -37,9 +43,12 @@ public final class PluginSettings {
         long requestExpire = Math.max(0L, config.getLong("request-expire-seconds", 60L));
         long teleportDelay = Math.max(0L, config.getLong("teleport-delay-seconds", 5L));
         boolean liveLocation = config.getBoolean("teleport-to-live-location", false);
+        boolean retractPending = config.getBoolean("tpacancel.retract-pending", true);
+        boolean cancelWarmup = config.getBoolean("tpacancel.cancel-warmup", true);
         List<CooldownGroup> groups = loadCooldownGroups(config.getConfigurationSection("cooldown-groups"));
         Map<String, String> aliases = loadCommandAliases(config.getConfigurationSection("command-aliases"));
-        return new PluginSettings(requestExpire, teleportDelay, liveLocation, groups, aliases);
+        return new PluginSettings(requestExpire, teleportDelay, liveLocation,
+                retractPending, cancelWarmup, groups, aliases);
     }
 
     public long requestExpireSeconds() {
@@ -52,6 +61,14 @@ public final class PluginSettings {
 
     public boolean teleportToLiveLocation() {
         return teleportToLiveLocation;
+    }
+
+    public boolean retractPendingEnabled() {
+        return retractPendingEnabled;
+    }
+
+    public boolean cancelWarmupEnabled() {
+        return cancelWarmupEnabled;
     }
 
     public List<CooldownGroup> cooldownGroups() {

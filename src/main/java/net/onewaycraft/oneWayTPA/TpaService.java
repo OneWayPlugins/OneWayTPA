@@ -7,6 +7,7 @@ import net.onewaycraft.oneWayTPA.api.event.TpaRequestAcceptEvent;
 import net.onewaycraft.oneWayTPA.api.event.TpaRequestDenyEvent;
 import net.onewaycraft.oneWayTPA.api.event.TpaRequestEvent;
 import net.onewaycraft.oneWayTPA.api.event.TpaRequestExpireEvent;
+import net.onewaycraft.oneWayTPA.api.event.TpaRequestRetractEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -142,6 +143,22 @@ public final class TpaService {
 
     public boolean cancelPendingTeleport(Player actor) {
         return teleports.cancelByParticipant(actor);
+    }
+
+    public int retractOwnPendingRequests(Player sender) {
+        List<TeleportRequest> retracted = requests.removeBySender(sender.getUniqueId());
+        if (retracted.isEmpty()) {
+            return 0;
+        }
+        for (TeleportRequest request : retracted) {
+            Bukkit.getPluginManager().callEvent(new TpaRequestRetractEvent(request, sender));
+            Player receiver = Bukkit.getPlayer(request.receiverId());
+            if (receiver != null && receiver.isOnline()) {
+                messages.send(receiver, "request-retracted-by-sender",
+                        Map.of("player", sender.getName()));
+            }
+        }
+        return retracted.size();
     }
 
     public PlayerInfoSnapshot getPlayerInfo(Player player) {
