@@ -1,7 +1,7 @@
 # OneWayTPA
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](CHANGELOG.md)
 [![Paper](https://img.shields.io/badge/Paper-1.21.x-orange.svg)](https://papermc.io)
 [![Folia](https://img.shields.io/badge/Folia-supported-green.svg)](https://papermc.io/software/folia)
 [![Java](https://img.shields.io/badge/Java-21-red.svg)](https://adoptium.net)
@@ -44,7 +44,7 @@ Windows:
 .\gradlew.bat build
 ```
 
-The resulting JAR is at `build/libs/OneWayTPA-2.2.0.jar`.
+The resulting JAR is at `build/libs/OneWayTPA-2.3.0.jar`.
 
 ## Commands
 
@@ -52,8 +52,8 @@ The resulting JAR is at `build/libs/OneWayTPA-2.2.0.jar`.
 |---|---|---|---|---|
 | `/tpa <player>` | Request to teleport to a player | `onewaytpa.tpa` | ✓ | — |
 | `/tpahere <player>` | Request to bring a player to you | `onewaytpa.tpahere` | ✓ | — |
-| `/tpaccept <player>` | Accept a pending request | `onewaytpa.tpaccept` | ✓ | — |
-| `/tpadeny <player>` | Deny a pending request | `onewaytpa.tpadeny` | ✓ | — |
+| `/tpaccept [player]` | Accept a pending request. Without a player arg, accepts the most recent pending (toggle in config) | `onewaytpa.tpaccept` | ✓ | — |
+| `/tpadeny [player]` | Deny a pending request. Without a player arg, denies the most recent pending (toggle in config) | `onewaytpa.tpadeny` | ✓ | — |
 | `/tpauto [player]` | No args: toggle global auto-accept. With a player arg: toggle per-player auto-accept | `onewaytpa.tpauto` | ✓ | — |
 | `/tpaignore [player]` | Toggle global ignore or per-player ignore | `onewaytpa.tpaignore` | ✓ | — |
 | `/tpacancel` | Retract own pending request, or cancel an in-flight warmup (see config) | `onewaytpa.tpacancel` | ✓ | — |
@@ -124,6 +124,11 @@ auto-accept-includes-tpahere: false
 # a different block during the warmup. Default true (Essentials-style).
 cancel-on-move: true
 
+# When true, /tpaccept and /tpadeny without a player argument target the most
+# recent pending request. When false, the player argument is required.
+# Default true.
+accept-most-recent-without-args: true
+
 # When true, OneWayTPA logs admin-facing INFO lines for request flow events.
 log-events: false
 
@@ -189,6 +194,14 @@ The reset also applies when a request is auto-accepted via `/tpauto`.
 
 By default (`cancel-on-move: true`), the teleport is aborted if the player being teleported walks to a different block during the warmup. Head/camera movement and sub-block jitter are ignored, so standing still on a slime block or looking around is fine. The cooldown is **not** refunded on a move-cancel — matches the existing `/tpacancel` warmup behaviour. Set the flag to `false` if you want players to be able to wander during the warmup (the 2.1 behaviour).
 
+### Accept / deny without arguments
+
+`/tpaccept` and `/tpadeny` accept an optional `<player>` argument. With the default `accept-most-recent-without-args: true`, calling either command without an argument targets the most recent pending request (the highest-id pending in the receiver's queue). With the flag off, the argument is mandatory and a missing argument prints the usage message.
+
+### Clickable cancel button on the warmup notification
+
+When a teleport's warmup begins, both the requester and the receiver receive the `teleport-delay` message with an appended clickable `[CANCEL]` button that runs `/tpacancel` for the clicker. The button is only rendered when `tpacancel.cancel-warmup` is true, so a disabled command never leaves a non-functional button behind.
+
 ## Public API
 
 External plugins can integrate via `OneWayTpaApi`. Add a `depend: [OneWayTPA]` or `softdepend: [OneWayTPA]` entry to your own `plugin.yml`.
@@ -214,6 +227,13 @@ int retracted = api.retractPendingRequests(sender);
 | `TpaRequestExpireEvent` | no | After a pending request expires |
 | `TpaTeleportEvent` | yes | Just before the warmup teleport is executed |
 | `TpaTeleportCompleteEvent` | no | After a successful teleport (may fire async) |
+
+## Migrating from 2.2
+
+`2.3.0` is additive on top of `2.2.0`:
+
+- **`/tpaccept` and `/tpadeny` now accept an optional `<player>` argument.** With the default `accept-most-recent-without-args: true`, calling either with no argument targets the most recent pending request. Set the flag to `false` to restore the 2.2 strictness.
+- **The `teleport-delay` warmup notification now ships with a clickable `[CANCEL]` button** when `tpacancel.cancel-warmup` is true. The lang key text shortened — the `Use /tpacancel to cancel.` trailing phrase is gone (the button replaces it). Existing servers with a translated `lang.yml` on disk keep their old wording until they regenerate the file.
 
 ## Migrating from 2.1
 

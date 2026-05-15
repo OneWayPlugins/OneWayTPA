@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-05-15
+
+### Added
+
+- `accept-most-recent-without-args` config flag (default `true`). When true, `/tpaccept` and `/tpadeny` without a player argument target the most recent pending request received by the player. When false, the player argument is required.
+- Clickable `[CANCEL]` button appended to the `teleport-delay` warmup notification. Runs `/tpacancel` for whoever clicks. Rendered only when `tpacancel.cancel-warmup` is true so a disabled command never produces a non-functional button.
+- `click-cancel` and `click-cancel-hover` lang keys for the new button's label and tooltip.
+- `no-pending-requests` lang key shown when a player runs `/tpaccept` or `/tpadeny` with no argument and has nothing pending.
+- `RequestService.mostRecentSenderName(UUID)` and `TpaService.mostRecentPendingSenderName(Player)` for resolving the most recent pending sender via the existing `TeleportRequest.id` ordering.
+
+### Changed
+
+- `TpaCommand.handleAccept` and `TpaCommand.handleDeny` now share a `resolveTargetSender` helper that branches on argument count and the new toggle.
+- `teleport-delay` lang key shortened from `Teleporting in {seconds}s. Use {command} to cancel.` to `Teleporting in {seconds}s.`. The `{command}` placeholder is no longer expanded.
+- `TeleportService.schedule` now calls a dedicated `notifyTeleportDelay` helper instead of the generic `notifyParticipants`, so it can build an Adventure Component with prefix + text + optional clickable button.
+
+### Migrating from 2.2
+
+- `/tpaccept` and `/tpadeny` keep accepting an explicit `<player>` argument; the no-argument shortcut is purely additive when the flag is on.
+- Operators who want the strict 2.2 behaviour should set `accept-most-recent-without-args: false`.
+- The `teleport-delay` text changed; servers with a translated `lang.yml` on disk will continue to read their old wording (with the now-unused `{command}` placeholder rendering verbatim) until they delete or update the file.
+
 ## [2.2.0] - 2026-05-15
 
 ### Added
