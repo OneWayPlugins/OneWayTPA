@@ -98,7 +98,6 @@ public final class OneWayTPA extends JavaPlugin {
         registerCommand("tpaccept", commandHandler);
         registerCommand("tpadeny", commandHandler);
         registerCommand("tpauto", commandHandler);
-        registerCommand("tpaauto", commandHandler);
         registerCommand("tpaignore", commandHandler);
         registerCommand("tpacancel", commandHandler);
 
