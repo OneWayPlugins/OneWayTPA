@@ -55,6 +55,11 @@ public final class MessageService {
         return value;
     }
 
+    public String rawString(String key, String fallback) {
+        String value = langConfig.getString("messages." + key);
+        return value != null ? value : fallback;
+    }
+
     private String applyPlaceholders(String input, Map<String, String> placeholders) {
         String output = input;
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {

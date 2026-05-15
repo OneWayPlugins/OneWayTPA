@@ -43,6 +43,10 @@ commands:
     description: Reload OneWayTPA configuration and messages.
     usage: /tpareload
     permission: onewaytpa.reload
+  onewaytpa:
+    description: OneWayTPA admin meta-command (console-friendly).
+    usage: /onewaytpa <reload|version|cancel|info> [player]
+    permission: onewaytpa.admin
 permissions:
   onewaytpa.*:
     description: All OneWayTPA permissions.
@@ -57,6 +61,7 @@ permissions:
       onewaytpa.tpaignore: true
       onewaytpa.tpacancel: true
       onewaytpa.reload: true
+      onewaytpa.admin: true
   onewaytpa.use:
     description: Basic TPA usage permissions.
     default: true
@@ -95,4 +100,24 @@ permissions:
     default: true
   onewaytpa.reload:
     description: Allows using /tpareload.
+    default: op
+  onewaytpa.admin:
+    description: Grants access to all /onewaytpa admin subcommands.
+    default: op
+    children:
+      onewaytpa.admin.reload: true
+      onewaytpa.admin.version: true
+      onewaytpa.admin.cancel: true
+      onewaytpa.admin.info: true
+  onewaytpa.admin.reload:
+    description: Allows /onewaytpa reload.
+    default: op
+  onewaytpa.admin.version:
+    description: Allows /onewaytpa version.
+    default: op
+  onewaytpa.admin.cancel:
+    description: Allows /onewaytpa cancel <player>.
+    default: op
+  onewaytpa.admin.info:
+    description: Allows /onewaytpa info <player>.
     default: op

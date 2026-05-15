@@ -73,6 +73,15 @@ public final class TeleportService {
         return false;
     }
 
+    public boolean isInvolvedInPendingTeleport(UUID playerId) {
+        for (PendingTeleport pending : pendingTeleports.values()) {
+            if (pending.involves(playerId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void cancelByParticipantSilently(UUID playerId) {
         for (Map.Entry<Long, PendingTeleport> entry : pendingTeleports.entrySet()) {
             PendingTeleport pending = entry.getValue();

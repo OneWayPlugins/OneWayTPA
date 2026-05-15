@@ -138,6 +138,18 @@ public final class TpaService {
         return teleports.cancelByParticipant(actor);
     }
 
+    public PlayerInfoSnapshot getPlayerInfo(Player player) {
+        UUID id = player.getUniqueId();
+        return new PlayerInfoSnapshot(
+                cooldowns.remainingSeconds(player),
+                preferences.isAutoAcceptingAll(id),
+                preferences.isIgnoringAll(id),
+                requests.incomingPendingCount(id),
+                requests.outgoingPendingCount(id),
+                teleports.isInvolvedInPendingTeleport(id)
+        );
+    }
+
     public boolean toggleAutoAcceptAll(Player player) {
         return preferences.toggleAutoAcceptAll(player);
     }

@@ -61,3 +61,26 @@ messages:
   teleport-failed: "&cThe teleport could not be completed."
 
   reload-success: "&aConfiguration and messages reloaded."
+
+  admin-usage: |
+    &eOneWayTPA admin commands:
+    &e/onewaytpa reload &7- Reload config and messages
+    &e/onewaytpa version &7- Show plugin version
+    &e/onewaytpa cancel <player> &7- Cancel a player's pending teleport
+    &e/onewaytpa info <player> &7- Show a player's TPA state
+  admin-no-permission: "&cYou do not have permission to use that subcommand."
+  admin-unknown-subcommand: "&cUnknown subcommand: &e{subcommand}&c."
+  admin-reload-success: "&aOneWayTPA configuration and messages reloaded."
+  admin-version: "&aOneWayTPA version &e{version}&a."
+  admin-player-not-found: "&cPlayer &e{player} &cis not online."
+  admin-cancel-success: "&aCancelled the pending teleport for &e{player}&a."
+  admin-cancel-none: "&c{player} has no pending teleport to cancel."
+  admin-info-header: "&6OneWayTPA info for &e{player}&6:"
+  admin-info-line-cooldown: "&7- Cooldown remaining: &e{seconds}s"
+  admin-info-line-auto-accept-all: "&7- Auto-accept all: &e{state}"
+  admin-info-line-ignore-all: "&7- Ignore all: &e{state}"
+  admin-info-line-pending-incoming: "&7- Incoming pending requests: &e{count}"
+  admin-info-line-pending-outgoing: "&7- Outgoing pending requests: &e{count}"
+  admin-info-line-in-flight: "&7- Currently in an in-flight teleport: &e{state}"
+  admin-info-line-state-yes: "yes"
+  admin-info-line-state-no: "no"

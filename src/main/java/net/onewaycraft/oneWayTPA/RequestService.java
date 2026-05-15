@@ -93,6 +93,21 @@ public final class RequestService {
         return receiverRequests != null && receiverRequests.containsKey(senderId);
     }
 
+    public int incomingPendingCount(UUID receiverId) {
+        Map<UUID, TeleportRequest> receiverRequests = pendingRequests.get(receiverId);
+        return receiverRequests == null ? 0 : receiverRequests.size();
+    }
+
+    public int outgoingPendingCount(UUID senderId) {
+        int count = 0;
+        for (Map<UUID, TeleportRequest> inner : pendingRequests.values()) {
+            if (inner.containsKey(senderId)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public void removeByPlayer(UUID playerId) {
         pendingRequests.remove(playerId);
 
