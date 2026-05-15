@@ -20,6 +20,7 @@ public final class PluginSettings {
     private final boolean teleportToLiveLocation;
     private final boolean retractPendingEnabled;
     private final boolean cancelWarmupEnabled;
+    private final boolean logEvents;
     private final List<CooldownGroup> cooldownGroups;
     private final Map<String, String> commandAliases;
 
@@ -28,6 +29,7 @@ public final class PluginSettings {
                           boolean teleportToLiveLocation,
                           boolean retractPendingEnabled,
                           boolean cancelWarmupEnabled,
+                          boolean logEvents,
                           List<CooldownGroup> cooldownGroups,
                           Map<String, String> commandAliases) {
         this.requestExpireSeconds = Math.max(0L, requestExpireSeconds);
@@ -35,6 +37,7 @@ public final class PluginSettings {
         this.teleportToLiveLocation = teleportToLiveLocation;
         this.retractPendingEnabled = retractPendingEnabled;
         this.cancelWarmupEnabled = cancelWarmupEnabled;
+        this.logEvents = logEvents;
         this.cooldownGroups = List.copyOf(cooldownGroups);
         this.commandAliases = Map.copyOf(commandAliases);
     }
@@ -45,10 +48,11 @@ public final class PluginSettings {
         boolean liveLocation = config.getBoolean("teleport-to-live-location", false);
         boolean retractPending = config.getBoolean("tpacancel.retract-pending", true);
         boolean cancelWarmup = config.getBoolean("tpacancel.cancel-warmup", true);
+        boolean logEvents = config.getBoolean("log-events", false);
         List<CooldownGroup> groups = loadCooldownGroups(config.getConfigurationSection("cooldown-groups"));
         Map<String, String> aliases = loadCommandAliases(config.getConfigurationSection("command-aliases"));
         return new PluginSettings(requestExpire, teleportDelay, liveLocation,
-                retractPending, cancelWarmup, groups, aliases);
+                retractPending, cancelWarmup, logEvents, groups, aliases);
     }
 
     public long requestExpireSeconds() {
@@ -69,6 +73,10 @@ public final class PluginSettings {
 
     public boolean cancelWarmupEnabled() {
         return cancelWarmupEnabled;
+    }
+
+    public boolean logEvents() {
+        return logEvents;
     }
 
     public List<CooldownGroup> cooldownGroups() {

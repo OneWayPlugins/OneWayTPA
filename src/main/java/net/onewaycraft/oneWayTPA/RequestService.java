@@ -10,6 +10,17 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Storage for still-pending, not-yet-accepted teleport requests.
+ * <p>
+ * Layout: {@code Map<receiverId, Map<senderId, TeleportRequest>>}. Each receiver may have
+ * multiple senders queued; each (receiver, sender) pair holds at most one request.
+ * Inner maps are removed automatically when they become empty.
+ * <p>
+ * All maps are {@link ConcurrentHashMap}s; reads and removals do not require external
+ * synchronisation. Request expiration is driven externally by
+ * {@link TpaService#expireRequest}, which calls {@link #expire(TeleportRequest)}.
+ */
 public final class RequestService {
 
     private final AtomicLong requestIdCounter = new AtomicLong();

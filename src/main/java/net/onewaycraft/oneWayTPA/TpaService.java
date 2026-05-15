@@ -15,7 +15,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Orchestrator service that coordinates pending teleport requests, cooldowns,
+ * player preferences, and scheduled teleports.
+ * <p>
+ * Public entry points correspond 1:1 to the player-facing commands
+ * (see {@link TpaCommand}) and the public API (see
+ * {@code net.onewaycraft.oneWayTPA.api.OneWayTpaApi}).
+ * <p>
+ * This class is intentionally the single funnel for state mutations so the rest
+ * of the plugin (commands, API, listeners) can stay thin and side-effect-free.
+ */
 public final class TpaService {
+
+    private static final long TICKS_PER_SECOND = 20L;
 
     private final OneWayTPA plugin;
     private final MessageService messages;
@@ -73,6 +86,7 @@ public final class TpaService {
             teleports.schedule(virtualRequest,
                     sender.getUniqueId(), sender.getName(),
                     receiver.getUniqueId(), receiver.getLocation().clone());
+            logEvent(() -> "Request auto-accepted: " + sender.getName() + " -> " + receiver.getName());
             return true;
         }
 
@@ -84,9 +98,10 @@ public final class TpaService {
             plugin.getServer().getGlobalRegionScheduler().runDelayed(
                     plugin,
                     task -> expireRequest(request),
-                    settings.requestExpireSeconds() * 20L
+                    settings.requestExpireSeconds() * TICKS_PER_SECOND
             );
         }
+        logEvent(() -> "Request created: " + sender.getName() + " -> " + receiver.getName() + " (" + type + ")");
         return true;
     }
 
@@ -115,12 +130,14 @@ public final class TpaService {
             teleports.schedule(request,
                     request.senderId(), request.senderName(),
                     receiver.getUniqueId(), receiver.getLocation().clone());
+            logEvent(() -> "Request accepted: " + request.senderName() + " -> " + receiver.getName() + " (TPA)");
             return true;
         }
 
         teleports.schedule(request,
                 request.receiverId(), request.receiverName(),
                 sender.getUniqueId(), sender.getLocation().clone());
+        logEvent(() -> "Request accepted: " + request.senderName() + " -> " + receiver.getName() + " (TPA_HERE)");
         return true;
     }
 
@@ -138,6 +155,7 @@ public final class TpaService {
         if (sender != null && sender.isOnline()) {
             messages.send(sender, "request-denied-sender", Map.of("player", receiver.getName()));
         }
+        logEvent(() -> "Request denied: " + request.senderName() + " -> " + receiver.getName());
         return true;
     }
 
@@ -158,6 +176,7 @@ public final class TpaService {
                         Map.of("player", sender.getName()));
             }
         }
+        logEvent(() -> "Requests retracted by " + sender.getName() + ": " + retracted.size());
         return retracted.size();
     }
 
@@ -264,6 +283,13 @@ public final class TpaService {
         Player receiver = Bukkit.getPlayer(request.receiverId());
         if (receiver != null && receiver.isOnline()) {
             messages.send(receiver, "request-expired-receiver", Map.of("player", request.senderName()));
+        }
+        logEvent(() -> "Request expired: " + request.senderName() + " -> " + request.receiverName());
+    }
+
+    private void logEvent(java.util.function.Supplier<String> message) {
+        if (settings.logEvents()) {
+            plugin.getLogger().info(message.get());
         }
     }
 }

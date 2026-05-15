@@ -14,6 +14,11 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
+/**
+ * Persistent per-player preferences: auto-accept lists (all / per-player) and
+ * ignore lists (all / per-player). Backed by {@code preferences.yml} in the
+ * plugin data folder, saved synchronously on every mutation.
+ */
 public final class PreferenceService {
 
     private final File file;

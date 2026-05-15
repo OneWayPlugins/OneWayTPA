@@ -12,6 +12,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Unified executor for the player-facing commands declared in {@code plugin.yml}:
+ * {@code /tpa}, {@code /tpahere}, {@code /tpaccept}, {@code /tpadeny},
+ * {@code /tpauto}, {@code /tpaauto}, {@code /tpaignore}, {@code /tpacancel}.
+ * Dispatches by {@link Command#getName()} to the corresponding handler.
+ * <p>
+ * All handlers require a {@link Player} sender — console invocations are rejected
+ * with the {@code players-only} message. Admin/console operations live in
+ * {@link OneWayTpaAdminCommand} instead.
+ */
 public final class TpaCommand implements CommandExecutor, TabCompleter {
 
     private final MessageService messages;

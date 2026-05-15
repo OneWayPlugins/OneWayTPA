@@ -7,6 +7,16 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Per-player rate limiter for outgoing /tpa and /tpahere requests.
+ * <p>
+ * Each player resolves to the duration of the first {@link CooldownGroup} whose
+ * permission they hold. A group with an empty permission string is the fallback
+ * applied when no other group matches. Group order is therefore significant —
+ * see {@code config.yml} for details.
+ * <p>
+ * State is held in memory and not persisted across restarts.
+ */
 public final class CooldownService {
 
     private final List<CooldownGroup> groups;

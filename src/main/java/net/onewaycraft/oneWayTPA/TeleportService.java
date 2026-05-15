@@ -12,7 +12,18 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Schedules and executes the post-accept warmup teleport.
+ * <p>
+ * {@code schedule(...)} stores a {@link PendingTeleport} keyed by an incrementing id,
+ * then enqueues a delayed task on the {@code GlobalRegionScheduler} (Folia-compatible).
+ * When the task fires, {@code execute(...)} resolves the destination — either the
+ * snapshot captured at accept time, or, if {@code teleport-to-live-location} is true,
+ * the destination player's current location read fresh.
+ */
 public final class TeleportService {
+
+    private static final long TICKS_PER_SECOND = 20L;
 
     private final Plugin plugin;
     private final MessageService messages;
@@ -60,7 +71,7 @@ public final class TeleportService {
         plugin.getServer().getGlobalRegionScheduler().runDelayed(
                 plugin,
                 task -> runScheduledTeleport(pending.id()),
-                delaySeconds * 20L
+                delaySeconds * TICKS_PER_SECOND
         );
     }
 

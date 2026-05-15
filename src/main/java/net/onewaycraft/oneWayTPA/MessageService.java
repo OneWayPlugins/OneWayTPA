@@ -10,6 +10,15 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ * Loads {@code lang.yml} from the plugin data folder and renders Adventure
+ * {@link Component}s with legacy {@code &}-color-code support and {@code {placeholder}}
+ * substitution. The {@code prefix} key is automatically prepended by {@link #send}.
+ * <p>
+ * If a key is missing the renderer returns a visible {@code [missing lang key: NAME]}
+ * marker rather than failing silently — this is intentional so translation gaps surface
+ * during testing.
+ */
 public final class MessageService {
 
     private final LegacyComponentSerializer legacySerializer = LegacyComponentSerializer.legacyAmpersand();
