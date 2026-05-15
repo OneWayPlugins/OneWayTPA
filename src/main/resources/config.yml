@@ -62,13 +62,7 @@ cooldown-groups:
     seconds: 30
 
 # Optional command aliases. Each entry maps alias -> canonical command name.
-# Default values preserve the Portuguese aliases shipped with OneWayTPA 1.x
-# and keep /tpaauto working as a synonym of /tpauto <player>.
-# Comment out or delete any entry to disable that alias.
+# The default only carries the /tpaauto compatibility shim from the 2.1 merge.
 # Add your own entries to provide additional shortcuts (e.g. mytpa: tpa).
 command-aliases:
-  tpaaqui: tpahere
-  tparecusar: tpadeny
-  tpaignorar: tpaignore
-  tpacancelar: tpacancel
   tpaauto: tpauto
