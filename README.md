@@ -1,7 +1,7 @@
 # OneWayTPA
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](CHANGELOG.md)
 [![Paper](https://img.shields.io/badge/Paper-1.21.x-orange.svg)](https://papermc.io)
 [![Folia](https://img.shields.io/badge/Folia-supported-green.svg)](https://papermc.io/software/folia)
 [![Java](https://img.shields.io/badge/Java-21-red.svg)](https://adoptium.net)
@@ -44,7 +44,7 @@ Windows:
 .\gradlew.bat build
 ```
 
-The resulting JAR is at `build/libs/OneWayTPA-2.0.0.jar`.
+The resulting JAR is at `build/libs/OneWayTPA-2.1.0.jar`.
 
 ## Commands
 
@@ -54,8 +54,7 @@ The resulting JAR is at `build/libs/OneWayTPA-2.0.0.jar`.
 | `/tpahere <player>` | Request to bring a player to you | `onewaytpa.tpahere` | ✓ | — |
 | `/tpaccept <player>` | Accept a pending request | `onewaytpa.tpaccept` | ✓ | — |
 | `/tpadeny <player>` | Deny a pending request | `onewaytpa.tpadeny` | ✓ | — |
-| `/tpauto` | Toggle global auto-accept for `/tpa` | `onewaytpa.tpauto` | ✓ | — |
-| `/tpaauto <player>` | Toggle auto-accept of `/tpa` from a specific player | `onewaytpa.tpaauto` | ✓ | — |
+| `/tpauto [player]` | No args: toggle global auto-accept. With a player arg: toggle per-player auto-accept | `onewaytpa.tpauto` | ✓ | — |
 | `/tpaignore [player]` | Toggle global ignore or per-player ignore | `onewaytpa.tpaignore` | ✓ | — |
 | `/tpacancel` | Retract own pending request, or cancel an in-flight warmup (see config) | `onewaytpa.tpacancel` | ✓ | — |
 | `/tpareload` | Reload `config.yml` and `lang.yml` | `onewaytpa.reload` | ✓ | ✓ |
@@ -70,7 +69,8 @@ The resulting JAR is at `build/libs/OneWayTPA-2.0.0.jar`.
 |---|---|---|
 | `onewaytpa.use` | Bundle of all per-command player permissions | `true` |
 | `onewaytpa.*` | All permissions, including admin and reload | `op` |
-| `onewaytpa.tpa`, `.tpahere`, `.tpaccept`, `.tpadeny`, `.tpauto`, `.tpaauto`, `.tpaignore`, `.tpacancel` | Individual command permissions | `true` |
+| `onewaytpa.tpa`, `.tpahere`, `.tpaccept`, `.tpadeny`, `.tpauto`, `.tpaignore`, `.tpacancel` | Individual command permissions | `true` |
+| `onewaytpa.tpaauto` | Legacy node from 1.x / 2.0 — grants `onewaytpa.tpauto` for backward compatibility | `false` |
 | `onewaytpa.reload` | Allows `/tpareload` | `op` |
 | `onewaytpa.admin` | Bundle of all `/onewaytpa` admin subcommands | `op` |
 | `onewaytpa.admin.reload`, `.version`, `.cancel`, `.info` | Per-subcommand admin permissions | `op` |
@@ -107,6 +107,19 @@ tpacancel:
   # the in-flight teleport (original 1.x behaviour).
   cancel-warmup: true
 
+# When true, the sender's cooldown is cleared after their request is accepted
+# (manually or via auto-accept). Default true.
+reset-cooldown-on-accept: true
+
+# When true, the sender's cooldown is cleared after their request is denied.
+# Default true.
+reset-cooldown-on-deny: true
+
+# When true, auto-accept (both /tpauto and /tpauto <player>) also applies to
+# /tpahere requests, not just /tpa. Default false because /tpahere summons are
+# more invasive.
+auto-accept-includes-tpahere: false
+
 # When true, OneWayTPA logs admin-facing INFO lines for request flow events.
 log-events: false
 
@@ -125,12 +138,14 @@ cooldown-groups:
     seconds: 30
 
 # Optional command aliases. Each entry maps alias -> canonical command name.
-# Defaults preserve the Portuguese aliases shipped with OneWayTPA 1.x.
+# Defaults preserve the Portuguese aliases shipped with OneWayTPA 1.x and
+# the legacy /tpaauto command from 2.0.
 command-aliases:
   tpaaqui: tpahere
   tparecusar: tpadeny
   tpaignorar: tpaignore
   tpacancelar: tpacancel
+  tpaauto: tpauto
 ```
 
 ### Cooldown groups walkthrough
@@ -160,6 +175,16 @@ The default (`teleport-to-live-location: false`) freezes the destination at the 
 
 Flip to `true` to re-read the destination player's location at execute-time. Useful for combat or escape scenarios where the receiver should genuinely be "where they are now." If the destination player is offline when the warmup ends, the teleport fails with `teleport-failed-destination-offline`.
 
+### Cooldown resets
+
+`reset-cooldown-on-accept` and `reset-cooldown-on-deny` (both default `true`) clear the sender's cooldown timestamp once their request reaches a terminal state. With the defaults, a player who gets accepted or denied can immediately send another `/tpa`; with them off, the configured cooldown still has to elapse.
+
+The reset also applies when a request is auto-accepted via `/tpauto`.
+
+### Auto-accept and `/tpahere`
+
+`/tpauto` and `/tpauto <player>` only affect incoming `/tpa` requests by default. Set `auto-accept-includes-tpahere: true` to extend auto-accept to `/tpahere` summons as well — useful for trusted-buddy setups where you want the other player to be able to pull you to them without a prompt. Off by default because `/tpahere` is more invasive than `/tpa`.
+
 ## Public API
 
 External plugins can integrate via `OneWayTpaApi`. Add a `depend: [OneWayTPA]` or `softdepend: [OneWayTPA]` entry to your own `plugin.yml`.
@@ -186,9 +211,18 @@ int retracted = api.retractPendingRequests(sender);
 | `TpaTeleportEvent` | yes | Just before the warmup teleport is executed |
 | `TpaTeleportCompleteEvent` | no | After a successful teleport (may fire async) |
 
+## Migrating from 2.0
+
+`2.1.0` is additive on top of `2.0.0` with one mild breaking change:
+
+- **`/tpaauto` is gone as a standalone command.** Its functionality moved into `/tpauto <player>`. The name still works via the runtime alias system (`tpaauto: tpauto` is in the default `command-aliases`).
+- **`onewaytpa.tpaauto` permission node is deprecated** but still recognised — it now grants `onewaytpa.tpauto` via permission inheritance. Update your permissions setup at your convenience.
+- **New defaults are player-friendly.** `reset-cooldown-on-accept` and `reset-cooldown-on-deny` default `true`. If you prefer 2.0 semantics, set them to `false`.
+- **`auto-accept-includes-tpahere` defaults `false`** — same effective behaviour as 2.0 (auto-accept only affects `/tpa`). Flip to `true` to extend.
+
 ## Migrating from 1.x
 
-The `2.0.0` release is mostly additive but contains the following user-visible changes:
+The `2.0.0` release was mostly additive but contained the following user-visible changes (all still apply):
 
 - **All chat messages, command descriptions, and `config.yml` comments are now in English.** If you keep your old Portuguese `lang.yml`/`config.yml`, OneWayTPA will continue to use them as-is (new keys fall back to a clearly-marked `[missing lang key: ...]` token). To pick up the new English defaults, back up your old files and let the plugin regenerate them on next start.
 - **Portuguese aliases moved from `plugin.yml` into `config.yml`** as `command-aliases`. The defaults still include `tpaaqui`, `tparecusar`, `tpaignorar`, `tpacancelar`, so existing players don't lose anything. Edit, remove, or add aliases without rebuilding.

@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-05-15
+
+### Added
+
+- `reset-cooldown-on-accept` config flag (default `true`). When true, the sender's cooldown is cleared after their request is accepted manually or via auto-accept. A completed flow no longer penalises the sender with a leftover cooldown.
+- `reset-cooldown-on-deny` config flag (default `true`). When true, the sender's cooldown is cleared after their request is denied. A denied sender can immediately try another player.
+- `auto-accept-includes-tpahere` config flag (default `false`). When true, both the global `/tpauto` toggle and per-player `/tpauto <player>` also auto-accept incoming `/tpahere` summons. Default off because `/tpahere` is more invasive than `/tpa`.
+- Default `command-aliases` now includes `tpaauto: tpauto` so the legacy command name keeps working.
+
+### Changed
+
+- **`/tpauto` and `/tpaauto` merged into a single `/tpauto [player]` command.** With no args it toggles global auto-accept; with a player arg it toggles per-player auto-accept. `/tpaauto Alice` still works via the runtime alias system.
+- `RequestService.createVirtualAcceptedTpa(Player, Player)` renamed to `createVirtualAccepted(Player, Player, RequestType)` so auto-accept can produce the correct request type for `/tpahere` summons.
+- `TpaService.sendRequest` now branches the auto-accept schedule call by request type, so an auto-accepted `/tpahere` actually teleports the receiver to the sender (as a manual accept would).
+- `usage-tpauto` lang key updated to `"Usage: /tpauto [player]"`.
+- `tpauto-enabled` / `tpauto-disabled` wording generalised to "Global auto-accept enabled/disabled."
+- `tpaauto-enabled` / `tpaauto-disabled` wording dropped the "/tpa"-specific phrasing in favour of "Auto-accept from {player} enabled/disabled."
+
+### Deprecated
+
+- `onewaytpa.tpaauto` permission node — now a backward-compat shim that grants `onewaytpa.tpauto` via permission inheritance. Servers using LuckPerms with literal `onewaytpa.tpaauto` grants continue to work; prefer `onewaytpa.tpauto` for new setups.
+
+### Removed
+
+- `/tpaauto` command from `plugin.yml` (handled by `/tpauto <player>` and the alias system).
+- `usage-tpaauto` lang key (covered by `usage-tpauto`).
+- `onewaytpa.tpaauto` entry from the `onewaytpa.*` and `onewaytpa.use` permission bundles (redundant — both already grant `onewaytpa.tpauto`).
+
+### Migrating from 2.0
+
+- `/tpaauto Alice` keeps working unchanged via the new `tpaauto: tpauto` runtime alias.
+- LuckPerms grants of `onewaytpa.tpaauto` keep working via permission inheritance.
+- Server admins who want the 2.0 cooldown semantics back can set `reset-cooldown-on-accept: false` and `reset-cooldown-on-deny: false`.
+
 ## [2.0.0] - 2026-05-15
 
 ### Added
