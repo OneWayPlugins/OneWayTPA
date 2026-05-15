@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-05-15
+
+### Added
+
+- `cancel-on-move` config flag (default `true`). When true, the teleport is aborted if the player being teleported walks to a different block during the warmup. Head/camera movement and sub-block jitter are ignored.
+- `teleport-cancelled-move` lang key with `{player}` placeholder, sent to both participants when movement aborts a warmup.
+- New `PlayerMoveListener` registered at `EventPriority.MONITOR` with `ignoreCancelled = true`. Uses `PlayerMoveEvent.hasChangedBlock()` as a fast pre-filter so most events return immediately.
+
+### Changed
+
+- `PendingTeleport` gained a `startLocation` field that records the teleported player's position when the warmup begins; used by `cancel-on-move`.
+- `TeleportService.schedule` signature now requires the start location. All four call sites in `TpaService` pass the teleported player's current location.
+- `TeleportService.cancelIfMovedFromStart(Player)` and `TpaService.handlePlayerMoved(Player)` added to glue the listener into the existing pending-teleport map.
+- A teleport is also cancelled if the player changes worlds during the warmup (the world check is part of the move comparison).
+
+### Removed
+
+- Portuguese aliases (`tpaaqui`, `tparecusar`, `tpaignorar`, `tpacancelar`) removed from the default `command-aliases` in `config.yml`. Existing installs keep their on-disk values; only fresh installs are affected. The runtime alias system is unchanged — administrators can still add any aliases they like.
+
+### Migrating from 2.1
+
+- `cancel-on-move: true` is the new default. Servers that want the 2.1 behaviour (movement does not affect a warmup) should add `cancel-on-move: false` to their `config.yml`.
+- Existing `config.yml` files keep the Portuguese aliases until the operator edits them out; only fresh installs lose them.
+- The cooldown is not refunded on a move-cancel (matches the existing `/tpacancel` warmup behaviour).
+
 ## [2.1.0] - 2026-05-15
 
 ### Added

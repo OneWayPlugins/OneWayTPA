@@ -1,7 +1,7 @@
 # OneWayTPA
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](CHANGELOG.md)
 [![Paper](https://img.shields.io/badge/Paper-1.21.x-orange.svg)](https://papermc.io)
 [![Folia](https://img.shields.io/badge/Folia-supported-green.svg)](https://papermc.io/software/folia)
 [![Java](https://img.shields.io/badge/Java-21-red.svg)](https://adoptium.net)
@@ -44,7 +44,7 @@ Windows:
 .\gradlew.bat build
 ```
 
-The resulting JAR is at `build/libs/OneWayTPA-2.1.0.jar`.
+The resulting JAR is at `build/libs/OneWayTPA-2.2.0.jar`.
 
 ## Commands
 
@@ -120,6 +120,10 @@ reset-cooldown-on-deny: true
 # more invasive.
 auto-accept-includes-tpahere: false
 
+# When true, the teleport is cancelled if the player being teleported moves to
+# a different block during the warmup. Default true (Essentials-style).
+cancel-on-move: true
+
 # When true, OneWayTPA logs admin-facing INFO lines for request flow events.
 log-events: false
 
@@ -138,13 +142,9 @@ cooldown-groups:
     seconds: 30
 
 # Optional command aliases. Each entry maps alias -> canonical command name.
-# Defaults preserve the Portuguese aliases shipped with OneWayTPA 1.x and
-# the legacy /tpaauto command from 2.0.
+# The default only carries the /tpaauto compatibility shim from the 2.1 merge.
+# Add your own entries to provide additional shortcuts (e.g. mytpa: tpa).
 command-aliases:
-  tpaaqui: tpahere
-  tparecusar: tpadeny
-  tpaignorar: tpaignore
-  tpacancelar: tpacancel
   tpaauto: tpauto
 ```
 
@@ -185,6 +185,10 @@ The reset also applies when a request is auto-accepted via `/tpauto`.
 
 `/tpauto` and `/tpauto <player>` only affect incoming `/tpa` requests by default. Set `auto-accept-includes-tpahere: true` to extend auto-accept to `/tpahere` summons as well — useful for trusted-buddy setups where you want the other player to be able to pull you to them without a prompt. Off by default because `/tpahere` is more invasive than `/tpa`.
 
+### Cancel on movement
+
+By default (`cancel-on-move: true`), the teleport is aborted if the player being teleported walks to a different block during the warmup. Head/camera movement and sub-block jitter are ignored, so standing still on a slime block or looking around is fine. The cooldown is **not** refunded on a move-cancel — matches the existing `/tpacancel` warmup behaviour. Set the flag to `false` if you want players to be able to wander during the warmup (the 2.1 behaviour).
+
 ## Public API
 
 External plugins can integrate via `OneWayTpaApi`. Add a `depend: [OneWayTPA]` or `softdepend: [OneWayTPA]` entry to your own `plugin.yml`.
@@ -210,6 +214,14 @@ int retracted = api.retractPendingRequests(sender);
 | `TpaRequestExpireEvent` | no | After a pending request expires |
 | `TpaTeleportEvent` | yes | Just before the warmup teleport is executed |
 | `TpaTeleportCompleteEvent` | no | After a successful teleport (may fire async) |
+
+## Migrating from 2.1
+
+`2.2.0` is additive on top of `2.1.0` with one default behaviour change:
+
+- **`cancel-on-move: true` is the new default.** Teleports now abort if the player being teleported walks during the warmup. Set the flag to `false` to keep the 2.1 behaviour (movement does nothing).
+- **Portuguese aliases (`tpaaqui`, `tparecusar`, `tpaignorar`, `tpacancelar`) are gone from the default `command-aliases`.** Existing servers keep them in their on-disk `config.yml`; only fresh installs are affected. Add them back manually if you need them.
+- **`tpaauto: tpauto` is still the only default alias** — the 2.1 `/tpauto` merge compatibility shim stays.
 
 ## Migrating from 2.0
 
