@@ -20,6 +20,8 @@ public final class PluginSettings {
     private final boolean teleportToLiveLocation;
     private final boolean retractPendingEnabled;
     private final boolean cancelWarmupEnabled;
+    private final boolean resetCooldownOnAccept;
+    private final boolean resetCooldownOnDeny;
     private final boolean logEvents;
     private final List<CooldownGroup> cooldownGroups;
     private final Map<String, String> commandAliases;
@@ -29,6 +31,8 @@ public final class PluginSettings {
                           boolean teleportToLiveLocation,
                           boolean retractPendingEnabled,
                           boolean cancelWarmupEnabled,
+                          boolean resetCooldownOnAccept,
+                          boolean resetCooldownOnDeny,
                           boolean logEvents,
                           List<CooldownGroup> cooldownGroups,
                           Map<String, String> commandAliases) {
@@ -37,6 +41,8 @@ public final class PluginSettings {
         this.teleportToLiveLocation = teleportToLiveLocation;
         this.retractPendingEnabled = retractPendingEnabled;
         this.cancelWarmupEnabled = cancelWarmupEnabled;
+        this.resetCooldownOnAccept = resetCooldownOnAccept;
+        this.resetCooldownOnDeny = resetCooldownOnDeny;
         this.logEvents = logEvents;
         this.cooldownGroups = List.copyOf(cooldownGroups);
         this.commandAliases = Map.copyOf(commandAliases);
@@ -48,11 +54,13 @@ public final class PluginSettings {
         boolean liveLocation = config.getBoolean("teleport-to-live-location", false);
         boolean retractPending = config.getBoolean("tpacancel.retract-pending", true);
         boolean cancelWarmup = config.getBoolean("tpacancel.cancel-warmup", true);
+        boolean resetOnAccept = config.getBoolean("reset-cooldown-on-accept", true);
+        boolean resetOnDeny = config.getBoolean("reset-cooldown-on-deny", true);
         boolean logEvents = config.getBoolean("log-events", false);
         List<CooldownGroup> groups = loadCooldownGroups(config.getConfigurationSection("cooldown-groups"));
         Map<String, String> aliases = loadCommandAliases(config.getConfigurationSection("command-aliases"));
         return new PluginSettings(requestExpire, teleportDelay, liveLocation,
-                retractPending, cancelWarmup, logEvents, groups, aliases);
+                retractPending, cancelWarmup, resetOnAccept, resetOnDeny, logEvents, groups, aliases);
     }
 
     public long requestExpireSeconds() {
@@ -73,6 +81,14 @@ public final class PluginSettings {
 
     public boolean cancelWarmupEnabled() {
         return cancelWarmupEnabled;
+    }
+
+    public boolean resetCooldownOnAccept() {
+        return resetCooldownOnAccept;
+    }
+
+    public boolean resetCooldownOnDeny() {
+        return resetCooldownOnDeny;
     }
 
     public boolean logEvents() {

@@ -22,6 +22,15 @@ tpacancel:
   # the in-flight teleport (original 1.x behaviour).
   cancel-warmup: true
 
+# When true, the sender's cooldown is cleared after their request is accepted
+# (manually or via auto-accept). Default true: a completed flow does not penalise
+# the sender with a leftover cooldown.
+reset-cooldown-on-accept: true
+
+# When true, the sender's cooldown is cleared after their request is denied.
+# Default true: a denied sender can immediately try another player.
+reset-cooldown-on-deny: true
+
 # When true, OneWayTPA logs admin-facing INFO lines for request flow events
 # (sent, accepted, denied, expired, retracted, teleported, cancelled).
 # Off by default to keep the console clean. Flip to true when debugging.

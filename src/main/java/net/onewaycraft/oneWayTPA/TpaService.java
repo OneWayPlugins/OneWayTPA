@@ -86,6 +86,7 @@ public final class TpaService {
             teleports.schedule(virtualRequest,
                     sender.getUniqueId(), sender.getName(),
                     receiver.getUniqueId(), receiver.getLocation().clone());
+            maybeResetCooldownForAccept(sender.getUniqueId());
             logEvent(() -> "Request auto-accepted: " + sender.getName() + " -> " + receiver.getName());
             return true;
         }
@@ -130,6 +131,7 @@ public final class TpaService {
             teleports.schedule(request,
                     request.senderId(), request.senderName(),
                     receiver.getUniqueId(), receiver.getLocation().clone());
+            maybeResetCooldownForAccept(request.senderId());
             logEvent(() -> "Request accepted: " + request.senderName() + " -> " + receiver.getName() + " (TPA)");
             return true;
         }
@@ -137,6 +139,7 @@ public final class TpaService {
         teleports.schedule(request,
                 request.receiverId(), request.receiverName(),
                 sender.getUniqueId(), sender.getLocation().clone());
+        maybeResetCooldownForAccept(request.senderId());
         logEvent(() -> "Request accepted: " + request.senderName() + " -> " + receiver.getName() + " (TPA_HERE)");
         return true;
     }
@@ -154,6 +157,9 @@ public final class TpaService {
         Player sender = Bukkit.getPlayer(request.senderId());
         if (sender != null && sender.isOnline()) {
             messages.send(sender, "request-denied-sender", Map.of("player", receiver.getName()));
+        }
+        if (settings.resetCooldownOnDeny()) {
+            cooldowns.removePlayer(request.senderId());
         }
         logEvent(() -> "Request denied: " + request.senderName() + " -> " + receiver.getName());
         return true;
@@ -285,6 +291,12 @@ public final class TpaService {
             messages.send(receiver, "request-expired-receiver", Map.of("player", request.senderName()));
         }
         logEvent(() -> "Request expired: " + request.senderName() + " -> " + request.receiverName());
+    }
+
+    private void maybeResetCooldownForAccept(UUID senderId) {
+        if (settings.resetCooldownOnAccept()) {
+            cooldowns.removePlayer(senderId);
+        }
     }
 
     private void logEvent(java.util.function.Supplier<String> message) {
