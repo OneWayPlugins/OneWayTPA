@@ -1,67 +1,42 @@
-# How long a pending /tpa or /tpahere request stays valid before expiring.
+# Seconds before a pending /tpa or /tpahere request expires.
 request-expire-seconds: 60
 
-# Delay between /tpaccept and the actual teleport.
-# During this window, /tpacancel can interrupt the teleport.
+# Seconds between /tpaccept and the actual teleport (warmup).
 teleport-delay-seconds: 5
 
-# When false (default), the destination is captured at /tpaccept time and is
-# unchanged even if the destination player moves during the warmup.
-# When true, the destination is re-read at the moment of teleport execution.
-# If the destination player is offline at execute time, the teleport fails.
+# Re-read the destination at teleport time instead of capturing it at /tpaccept.
 teleport-to-live-location: false
 
-# /tpacancel behaviour. Both flags are independent. When both are off, /tpacancel
-# is fully disabled and shows the tpacancel-disabled message.
+# /tpacancel behaviour. When both flags are off, /tpacancel is fully disabled.
 tpacancel:
-  # When true, the sender can /tpacancel to retract all their own still-pending,
-  # not-yet-accepted outgoing requests (Essentials-style sender retract).
+  # Sender can /tpacancel to retract their own pending outgoing requests.
   retract-pending: true
-
-  # When true, any participant can /tpacancel during the warmup window to cancel
-  # the in-flight teleport (original 1.x behaviour).
+  # /tpacancel interrupts an in-flight warmup.
   cancel-warmup: true
 
-# When true, the sender's cooldown is cleared after their request is accepted
-# (manually or via auto-accept). Default true: a completed flow does not penalise
-# the sender with a leftover cooldown.
+# Clear the sender's cooldown after their request is accepted.
 reset-cooldown-on-accept: true
 
-# When true, the sender's cooldown is cleared after their request is denied.
-# Default true: a denied sender can immediately try another player.
+# Clear the sender's cooldown after their request is denied.
 reset-cooldown-on-deny: true
 
-# When true, auto-accept (both the global /tpauto toggle and per-player
-# /tpauto <player>) also applies to /tpahere requests, not just /tpa.
-# Default false: /tpahere summons are more invasive, so the receiver
-# must explicitly accept them by default.
+# Apply auto-accept (/tpauto) to /tpahere requests as well as /tpa.
 auto-accept-includes-tpahere: false
 
-# When true, the teleport is cancelled if the player being teleported moves
-# to a different block during the warmup window. Head/camera movement is
-# ignored. Default true: matches the expected behaviour of Essentials and
-# most other TPA plugins. Cooldown is not refunded on a move-cancel.
+# Cancel the teleport if the player moves to a different block during warmup.
 cancel-on-move: true
 
-# When true, /tpaccept and /tpadeny without a player argument target the
-# most recent pending request received by the player. When false, both
-# commands strictly require /tpaccept <player> and /tpadeny <player>.
-# Default true: matches what most players expect from Essentials-style TPA.
+# /tpaccept and /tpadeny without args target the most recent pending request.
 accept-most-recent-without-args: true
 
-# Seconds of invulnerability granted after a successful teleport. All
-# incoming damage (PvP, mobs, fall, lava, void, etc.) is cancelled for the
-# teleported player during this window. Set to 0 to disable. Default 0 to
-# preserve 2.3 behaviour.
+# Seconds of damage immunity after a successful teleport. 0 to disable.
 post-teleport-invulnerability-seconds: 0
 
-# When true, OneWayTPA logs admin-facing INFO lines for request flow events
-# (sent, accepted, denied, expired, retracted, teleported, cancelled).
-# Off by default to keep the console clean. Flip to true when debugging.
+# Log request flow events as INFO. Off keeps the console clean.
 log-events: false
 
-# Cooldown groups for /tpa and /tpahere senders.
-# Order matters: the first group whose permission the player has wins.
+# Cooldown groups for /tpa senders.
+# Order matters: first matching permission wins; empty permission = fallback.
 cooldown-groups:
   vip:
     permission: "onewaytpa.cooldown.vip"
@@ -73,8 +48,6 @@ cooldown-groups:
     permission: ""
     seconds: 30
 
-# Optional command aliases. Each entry maps alias -> canonical command name.
-# The default only carries the /tpaauto compatibility shim from the 2.1 merge.
-# Add your own entries to provide additional shortcuts (e.g. mytpa: tpa).
+# Runtime command aliases: alias -> canonical command name.
 command-aliases:
   tpaauto: tpauto
