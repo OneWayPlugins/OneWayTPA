@@ -24,13 +24,9 @@ commands:
     usage: /tpadeny <player>
     permission: onewaytpa.tpadeny
   tpauto:
-    description: Toggle auto-accept for /tpa requests.
-    usage: /tpauto
+    description: Toggle auto-accept globally, or for a specific player.
+    usage: /tpauto [player]
     permission: onewaytpa.tpauto
-  tpaauto:
-    description: Toggle auto-accept of /tpa for a specific player.
-    usage: /tpaauto <player>
-    permission: onewaytpa.tpaauto
   tpaignore:
     description: Ignore teleport requests globally or from a specific player.
     usage: /tpaignore [player]
@@ -57,7 +53,6 @@ permissions:
       onewaytpa.tpaccept: true
       onewaytpa.tpadeny: true
       onewaytpa.tpauto: true
-      onewaytpa.tpaauto: true
       onewaytpa.tpaignore: true
       onewaytpa.tpacancel: true
       onewaytpa.reload: true
@@ -71,7 +66,6 @@ permissions:
       onewaytpa.tpaccept: true
       onewaytpa.tpadeny: true
       onewaytpa.tpauto: true
-      onewaytpa.tpaauto: true
       onewaytpa.tpaignore: true
       onewaytpa.tpacancel: true
   onewaytpa.tpa:
@@ -87,11 +81,13 @@ permissions:
     description: Allows using /tpadeny.
     default: true
   onewaytpa.tpauto:
-    description: Allows using /tpauto.
+    description: Allows using /tpauto (global toggle and per-player toggles).
     default: true
   onewaytpa.tpaauto:
-    description: Allows using /tpaauto.
-    default: true
+    description: Legacy permission node from OneWayTPA 1.x. Grants onewaytpa.tpauto for backward compatibility.
+    default: false
+    children:
+      onewaytpa.tpauto: true
   onewaytpa.tpaignore:
     description: Allows using /tpaignore.
     default: true

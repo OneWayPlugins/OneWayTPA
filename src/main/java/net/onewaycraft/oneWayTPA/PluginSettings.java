@@ -22,6 +22,7 @@ public final class PluginSettings {
     private final boolean cancelWarmupEnabled;
     private final boolean resetCooldownOnAccept;
     private final boolean resetCooldownOnDeny;
+    private final boolean autoAcceptIncludesTpahere;
     private final boolean logEvents;
     private final List<CooldownGroup> cooldownGroups;
     private final Map<String, String> commandAliases;
@@ -33,6 +34,7 @@ public final class PluginSettings {
                           boolean cancelWarmupEnabled,
                           boolean resetCooldownOnAccept,
                           boolean resetCooldownOnDeny,
+                          boolean autoAcceptIncludesTpahere,
                           boolean logEvents,
                           List<CooldownGroup> cooldownGroups,
                           Map<String, String> commandAliases) {
@@ -43,6 +45,7 @@ public final class PluginSettings {
         this.cancelWarmupEnabled = cancelWarmupEnabled;
         this.resetCooldownOnAccept = resetCooldownOnAccept;
         this.resetCooldownOnDeny = resetCooldownOnDeny;
+        this.autoAcceptIncludesTpahere = autoAcceptIncludesTpahere;
         this.logEvents = logEvents;
         this.cooldownGroups = List.copyOf(cooldownGroups);
         this.commandAliases = Map.copyOf(commandAliases);
@@ -56,11 +59,13 @@ public final class PluginSettings {
         boolean cancelWarmup = config.getBoolean("tpacancel.cancel-warmup", true);
         boolean resetOnAccept = config.getBoolean("reset-cooldown-on-accept", true);
         boolean resetOnDeny = config.getBoolean("reset-cooldown-on-deny", true);
+        boolean autoAcceptTpahere = config.getBoolean("auto-accept-includes-tpahere", false);
         boolean logEvents = config.getBoolean("log-events", false);
         List<CooldownGroup> groups = loadCooldownGroups(config.getConfigurationSection("cooldown-groups"));
         Map<String, String> aliases = loadCommandAliases(config.getConfigurationSection("command-aliases"));
         return new PluginSettings(requestExpire, teleportDelay, liveLocation,
-                retractPending, cancelWarmup, resetOnAccept, resetOnDeny, logEvents, groups, aliases);
+                retractPending, cancelWarmup, resetOnAccept, resetOnDeny, autoAcceptTpahere,
+                logEvents, groups, aliases);
     }
 
     public long requestExpireSeconds() {
@@ -89,6 +94,10 @@ public final class PluginSettings {
 
     public boolean resetCooldownOnDeny() {
         return resetCooldownOnDeny;
+    }
+
+    public boolean autoAcceptIncludesTpahere() {
+        return autoAcceptIncludesTpahere;
     }
 
     public boolean logEvents() {

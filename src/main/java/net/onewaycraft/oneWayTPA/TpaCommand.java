@@ -15,8 +15,13 @@ import java.util.Map;
 /**
  * Unified executor for the player-facing commands declared in {@code plugin.yml}:
  * {@code /tpa}, {@code /tpahere}, {@code /tpaccept}, {@code /tpadeny},
- * {@code /tpauto}, {@code /tpaauto}, {@code /tpaignore}, {@code /tpacancel}.
+ * {@code /tpauto}, {@code /tpaignore}, {@code /tpacancel}.
  * Dispatches by {@link Command#getName()} to the corresponding handler.
+ * <p>
+ * {@code /tpauto} dispatches further on argument count: with no args it toggles
+ * the global auto-accept; with one arg it toggles auto-accept for a specific player.
+ * The legacy {@code /tpaauto} name is preserved via the runtime alias system
+ * ({@code command-aliases} in {@code config.yml}).
  * <p>
  * All handlers require a {@link Player} sender — console invocations are rejected
  * with the {@code players-only} message. Admin/console operations live in
@@ -46,7 +51,6 @@ public final class TpaCommand implements CommandExecutor, TabCompleter {
             case "tpaccept" -> handleAccept(player, args);
             case "tpadeny" -> handleDeny(player, args);
             case "tpauto" -> handleTpAuto(player, args);
-            case "tpaauto" -> handleTpaAuto(player, args);
             case "tpaignore" -> handleIgnore(player, args);
             case "tpacancel" -> handleCancel(player, args);
             default -> {
@@ -100,38 +104,33 @@ public final class TpaCommand implements CommandExecutor, TabCompleter {
     }
 
     private void handleTpAuto(Player player, String[] args) {
-        if (args.length != 0) {
-            messages.send(player, "usage-tpauto");
+        if (args.length == 0) {
+            boolean enabled = service.toggleAutoAcceptAll(player);
+            messages.send(player, enabled ? "tpauto-enabled" : "tpauto-disabled");
             return;
         }
 
-        boolean enabled = service.toggleAutoAcceptAll(player);
-        messages.send(player, enabled ? "tpauto-enabled" : "tpauto-disabled");
-    }
+        if (args.length == 1) {
+            Player target = findOnlinePlayer(args[0]);
+            if (target == null) {
+                messages.send(player, "player-offline", Map.of("player", args[0]));
+                return;
+            }
+            if (target.getUniqueId().equals(player.getUniqueId())) {
+                messages.send(player, "cannot-self");
+                return;
+            }
 
-    private void handleTpaAuto(Player player, String[] args) {
-        if (args.length != 1) {
-            messages.send(player, "usage-tpaauto");
+            boolean enabled = service.toggleAutoAcceptPlayer(player, target);
+            messages.send(
+                    player,
+                    enabled ? "tpaauto-enabled" : "tpaauto-disabled",
+                    Map.of("player", target.getName())
+            );
             return;
         }
 
-        Player target = findOnlinePlayer(args[0]);
-        if (target == null) {
-            messages.send(player, "player-offline", Map.of("player", args[0]));
-            return;
-        }
-
-        if (target.getUniqueId().equals(player.getUniqueId())) {
-            messages.send(player, "cannot-self");
-            return;
-        }
-
-        boolean enabled = service.toggleAutoAcceptPlayer(player, target);
-        messages.send(
-                player,
-                enabled ? "tpaauto-enabled" : "tpaauto-disabled",
-                Map.of("player", target.getName())
-        );
+        messages.send(player, "usage-tpauto");
     }
 
     private void handleIgnore(Player player, String[] args) {
@@ -215,7 +214,7 @@ public final class TpaCommand implements CommandExecutor, TabCompleter {
         }
 
         if (commandName.equals("tpa") || commandName.equals("tpahere")
-                || commandName.equals("tpaauto") || commandName.equals("tpaignore")) {
+                || commandName.equals("tpauto") || commandName.equals("tpaignore")) {
             List<String> names = new ArrayList<>();
             for (Player online : Bukkit.getOnlinePlayers()) {
                 if (online.getUniqueId().equals(player.getUniqueId())) {

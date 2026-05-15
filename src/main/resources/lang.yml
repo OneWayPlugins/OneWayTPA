@@ -9,8 +9,7 @@ messages:
   usage-tpahere: "&eUsage: /tpahere <player>"
   usage-tpaccept: "&eUsage: /tpaccept <player>"
   usage-tpadeny: "&eUsage: /tpadeny <player>"
-  usage-tpauto: "&eUsage: /tpauto"
-  usage-tpaauto: "&eUsage: /tpaauto <player>"
+  usage-tpauto: "&eUsage: /tpauto [player]"
   usage-tpaignore: "&eUsage: /tpaignore [player]"
   usage-tpacancel: "&eUsage: /tpacancel"
 
@@ -40,10 +39,10 @@ messages:
   request-auto-accepted: "&a{player} has auto-accept enabled. Request accepted automatically."
   request-auto-accepted-receiver: "&7Request from &e{player} &7was auto-accepted."
 
-  tpauto-enabled: "&aAuto-accept for /tpa enabled (does not affect /tpahere)."
-  tpauto-disabled: "&cAuto-accept for /tpa disabled."
-  tpaauto-enabled: "&aAuto-accept for /tpa from &e{player} &aenabled."
-  tpaauto-disabled: "&cAuto-accept for /tpa from &e{player} &cdisabled."
+  tpauto-enabled: "&aGlobal auto-accept enabled."
+  tpauto-disabled: "&cGlobal auto-accept disabled."
+  tpaauto-enabled: "&aAuto-accept from &e{player} &aenabled."
+  tpaauto-disabled: "&cAuto-accept from &e{player} &cdisabled."
 
   ignore-all-enabled: "&cYou are now ignoring all teleport requests."
   ignore-all-disabled: "&aYou are no longer ignoring teleport requests."

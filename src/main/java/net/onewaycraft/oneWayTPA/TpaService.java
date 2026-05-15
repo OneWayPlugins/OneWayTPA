@@ -71,9 +71,11 @@ public final class TpaService {
             return false;
         }
 
-        if (type == RequestType.TPA && preferences.shouldAutoAccept(receiver, sender)) {
+        boolean autoAcceptEligible = type == RequestType.TPA
+                || (type == RequestType.TPA_HERE && settings.autoAcceptIncludesTpahere());
+        if (autoAcceptEligible && preferences.shouldAutoAccept(receiver, sender)) {
             cooldowns.markRequest(sender);
-            TeleportRequest virtualRequest = requests.createVirtualAcceptedTpa(sender, receiver);
+            TeleportRequest virtualRequest = requests.createVirtualAccepted(sender, receiver, type);
 
             TpaRequestAcceptEvent autoAcceptEvent = new TpaRequestAcceptEvent(virtualRequest, receiver);
             Bukkit.getPluginManager().callEvent(autoAcceptEvent);
@@ -83,11 +85,17 @@ public final class TpaService {
 
             messages.send(sender, "request-auto-accepted", Map.of("player", receiver.getName()));
             messages.send(receiver, "request-auto-accepted-receiver", Map.of("player", sender.getName()));
-            teleports.schedule(virtualRequest,
-                    sender.getUniqueId(), sender.getName(),
-                    receiver.getUniqueId(), receiver.getLocation().clone());
+            if (type == RequestType.TPA) {
+                teleports.schedule(virtualRequest,
+                        sender.getUniqueId(), sender.getName(),
+                        receiver.getUniqueId(), receiver.getLocation().clone());
+            } else {
+                teleports.schedule(virtualRequest,
+                        receiver.getUniqueId(), receiver.getName(),
+                        sender.getUniqueId(), sender.getLocation().clone());
+            }
             maybeResetCooldownForAccept(sender.getUniqueId());
-            logEvent(() -> "Request auto-accepted: " + sender.getName() + " -> " + receiver.getName());
+            logEvent(() -> "Request auto-accepted: " + sender.getName() + " -> " + receiver.getName() + " (" + type + ")");
             return true;
         }
 

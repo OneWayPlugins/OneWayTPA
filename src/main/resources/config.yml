@@ -31,6 +31,12 @@ reset-cooldown-on-accept: true
 # Default true: a denied sender can immediately try another player.
 reset-cooldown-on-deny: true
 
+# When true, auto-accept (both the global /tpauto toggle and per-player
+# /tpauto <player>) also applies to /tpahere requests, not just /tpa.
+# Default false: /tpahere summons are more invasive, so the receiver
+# must explicitly accept them by default.
+auto-accept-includes-tpahere: false
+
 # When true, OneWayTPA logs admin-facing INFO lines for request flow events
 # (sent, accepted, denied, expired, retracted, teleported, cancelled).
 # Off by default to keep the console clean. Flip to true when debugging.
@@ -50,7 +56,8 @@ cooldown-groups:
     seconds: 30
 
 # Optional command aliases. Each entry maps alias -> canonical command name.
-# Default values preserve the Portuguese aliases shipped with OneWayTPA 1.x.
+# Default values preserve the Portuguese aliases shipped with OneWayTPA 1.x
+# and keep /tpaauto working as a synonym of /tpauto <player>.
 # Comment out or delete any entry to disable that alias.
 # Add your own entries to provide additional shortcuts (e.g. mytpa: tpa).
 command-aliases:
@@ -58,3 +65,4 @@ command-aliases:
   tparecusar: tpadeny
   tpaignorar: tpaignore
   tpacancelar: tpacancel
+  tpaauto: tpauto

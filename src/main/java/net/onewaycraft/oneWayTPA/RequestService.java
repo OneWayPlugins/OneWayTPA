@@ -42,10 +42,10 @@ public final class RequestService {
         return request;
     }
 
-    public TeleportRequest createVirtualAcceptedTpa(Player sender, Player receiver) {
+    public TeleportRequest createVirtualAccepted(Player sender, Player receiver, RequestType type) {
         return new TeleportRequest(
                 requestIdCounter.incrementAndGet(),
-                RequestType.TPA,
+                type,
                 sender.getUniqueId(),
                 sender.getName(),
                 receiver.getUniqueId(),
