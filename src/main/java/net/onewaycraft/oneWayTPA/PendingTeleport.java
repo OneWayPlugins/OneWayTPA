@@ -13,6 +13,10 @@ import java.util.UUID;
  * used at execute-time. When the flag is true, the destination is re-read from
  * {@code destinationOwnerId}'s online player at execute-time and {@code destination}
  * is only kept as a fallback for event payloads.
+ * <p>
+ * {@code startLocation} holds the position of the teleported player at the moment the
+ * warmup begins, used by the {@code cancel-on-move} flag to detect when the player has
+ * walked away during the warmup and the teleport should be aborted.
  */
 public record PendingTeleport(
         long id,
@@ -23,7 +27,8 @@ public record PendingTeleport(
         UUID teleportedPlayerId,
         String teleportedPlayerName,
         UUID destinationOwnerId,
-        Location destination
+        Location destination,
+        Location startLocation
 ) {
     public boolean involves(UUID playerId) {
         return requesterId.equals(playerId) || receiverId.equals(playerId) || teleportedPlayerId.equals(playerId);

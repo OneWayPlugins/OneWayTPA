@@ -37,6 +37,12 @@ reset-cooldown-on-deny: true
 # must explicitly accept them by default.
 auto-accept-includes-tpahere: false
 
+# When true, the teleport is cancelled if the player being teleported moves
+# to a different block during the warmup window. Head/camera movement is
+# ignored. Default true: matches the expected behaviour of Essentials and
+# most other TPA plugins. Cooldown is not refunded on a move-cancel.
+cancel-on-move: true
+
 # When true, OneWayTPA logs admin-facing INFO lines for request flow events
 # (sent, accepted, denied, expired, retracted, teleported, cancelled).
 # Off by default to keep the console clean. Flip to true when debugging.

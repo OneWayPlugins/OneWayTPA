@@ -56,6 +56,7 @@ messages:
   tpacancel-retract-success: "&aRetracted &e{count} &apending teleport request(s)."
   teleport-cancelled-by: "&cTeleport cancelled by &e{player}&c."
   teleport-cancelled-offline: "&cTeleport cancelled: &e{player} &cwent offline."
+  teleport-cancelled-move: "&cTeleport cancelled: &e{player} &cmoved during the warmup."
 
   request-retracted-self: "&7You retracted &e{count} &7outgoing teleport request(s)."
   request-retracted-by-sender: "&7{player} &7retracted their teleport request."

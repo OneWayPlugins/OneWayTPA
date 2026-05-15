@@ -88,11 +88,13 @@ public final class TpaService {
             if (type == RequestType.TPA) {
                 teleports.schedule(virtualRequest,
                         sender.getUniqueId(), sender.getName(),
-                        receiver.getUniqueId(), receiver.getLocation().clone());
+                        receiver.getUniqueId(), receiver.getLocation().clone(),
+                        sender.getLocation().clone());
             } else {
                 teleports.schedule(virtualRequest,
                         receiver.getUniqueId(), receiver.getName(),
-                        sender.getUniqueId(), sender.getLocation().clone());
+                        sender.getUniqueId(), sender.getLocation().clone(),
+                        receiver.getLocation().clone());
             }
             maybeResetCooldownForAccept(sender.getUniqueId());
             logEvent(() -> "Request auto-accepted: " + sender.getName() + " -> " + receiver.getName() + " (" + type + ")");
@@ -138,7 +140,8 @@ public final class TpaService {
         if (request.type() == RequestType.TPA) {
             teleports.schedule(request,
                     request.senderId(), request.senderName(),
-                    receiver.getUniqueId(), receiver.getLocation().clone());
+                    receiver.getUniqueId(), receiver.getLocation().clone(),
+                    sender.getLocation().clone());
             maybeResetCooldownForAccept(request.senderId());
             logEvent(() -> "Request accepted: " + request.senderName() + " -> " + receiver.getName() + " (TPA)");
             return true;
@@ -146,7 +149,8 @@ public final class TpaService {
 
         teleports.schedule(request,
                 request.receiverId(), request.receiverName(),
-                sender.getUniqueId(), sender.getLocation().clone());
+                sender.getUniqueId(), sender.getLocation().clone(),
+                receiver.getLocation().clone());
         maybeResetCooldownForAccept(request.senderId());
         logEvent(() -> "Request accepted: " + request.senderName() + " -> " + receiver.getName() + " (TPA_HERE)");
         return true;
@@ -246,6 +250,13 @@ public final class TpaService {
         teleports.cancelByParticipantSilently(playerId);
         requests.removeByPlayer(playerId);
         cooldowns.removePlayer(playerId);
+    }
+
+    public void handlePlayerMoved(Player player) {
+        if (!settings.cancelOnMove()) {
+            return;
+        }
+        teleports.cancelIfMovedFromStart(player);
     }
 
     public void shutdown() {

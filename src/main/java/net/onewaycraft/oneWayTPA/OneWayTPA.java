@@ -39,6 +39,7 @@ public final class OneWayTPA extends JavaPlugin {
         aliasRegistrar.register(settings.commandAliases());
 
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerMoveListener(this), this);
     }
 
     @Override

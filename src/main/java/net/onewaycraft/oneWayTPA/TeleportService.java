@@ -43,7 +43,8 @@ public final class TeleportService {
                          UUID teleportedPlayerId,
                          String teleportedPlayerName,
                          UUID destinationOwnerId,
-                         Location destination) {
+                         Location destination,
+                         Location startLocation) {
         PendingTeleport pending = new PendingTeleport(
                 teleportIdCounter.incrementAndGet(),
                 request.senderId(),
@@ -53,7 +54,8 @@ public final class TeleportService {
                 teleportedPlayerId,
                 teleportedPlayerName,
                 destinationOwnerId,
-                destination.clone()
+                destination.clone(),
+                startLocation.clone()
         );
 
         if (delaySeconds <= 0L) {
@@ -98,6 +100,34 @@ public final class TeleportService {
             }
         }
         return false;
+    }
+
+    public void cancelIfMovedFromStart(Player player) {
+        UUID id = player.getUniqueId();
+        Location current = player.getLocation();
+        for (Map.Entry<Long, PendingTeleport> entry : pendingTeleports.entrySet()) {
+            PendingTeleport pending = entry.getValue();
+            if (!pending.teleportedPlayerId().equals(id)) {
+                continue;
+            }
+            Location start = pending.startLocation();
+            if (start == null) {
+                continue;
+            }
+            if (!sameWorld(start, current)
+                    || start.getBlockX() != current.getBlockX()
+                    || start.getBlockY() != current.getBlockY()
+                    || start.getBlockZ() != current.getBlockZ()) {
+                if (pendingTeleports.remove(entry.getKey(), pending)) {
+                    notifyParticipants(pending, "teleport-cancelled-move",
+                            Map.of("player", player.getName()));
+                }
+            }
+        }
+    }
+
+    private boolean sameWorld(Location a, Location b) {
+        return a.getWorld() != null && a.getWorld().equals(b.getWorld());
     }
 
     public void cancelByParticipantSilently(UUID playerId) {
