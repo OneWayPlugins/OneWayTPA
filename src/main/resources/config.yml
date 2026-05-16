@@ -32,6 +32,10 @@ accept-most-recent-without-args: true
 # Seconds of damage immunity after a successful teleport. 0 to disable.
 post-teleport-invulnerability-seconds: 0
 
+# When true, OneWayTPA honours bypass and override permissions
+# (e.g. onewaytpa.bypass.move, onewaytpa.warmup.<seconds>).
+permission-bypasses-enabled: true
+
 # Log request flow events as INFO. Off keeps the console clean.
 log-events: false
 
