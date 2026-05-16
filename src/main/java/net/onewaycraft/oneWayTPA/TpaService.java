@@ -47,7 +47,7 @@ public final class TpaService {
         this.settings = settings;
         this.permissions = permissions;
         this.cooldowns = new CooldownService(settings.cooldownGroups());
-        this.preferences = new PreferenceService(plugin);
+        this.preferences = new PreferenceService(plugin, settings);
         this.requests = new RequestService();
         this.invulnerability = new InvulnerabilityService();
         this.teleports = new TeleportService(plugin, messages, settings, permissions, invulnerability);

@@ -36,6 +36,13 @@ post-teleport-invulnerability-seconds: 0
 # (e.g. onewaytpa.bypass.move, onewaytpa.warmup.<seconds>).
 permission-bypasses-enabled: true
 
+# Default UI mode per flow for players who have not set a preference.
+# "gui" opens an inventory; "chat" uses the existing clickable chat prompts.
+ui-defaults:
+  receive: chat
+  send: chat
+  pending: chat
+
 # Log request flow events as INFO. Off keeps the console clean.
 log-events: false
 

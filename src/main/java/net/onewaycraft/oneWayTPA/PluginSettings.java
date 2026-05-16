@@ -4,6 +4,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -30,6 +31,7 @@ public final class PluginSettings {
     private final boolean logEvents;
     private final List<CooldownGroup> cooldownGroups;
     private final Map<String, String> commandAliases;
+    private final Map<UiFlow, Boolean> uiDefaults;
 
     public PluginSettings(long requestExpireSeconds,
                           long teleportDelaySeconds,
@@ -45,7 +47,8 @@ public final class PluginSettings {
                           boolean permissionBypassesEnabled,
                           boolean logEvents,
                           List<CooldownGroup> cooldownGroups,
-                          Map<String, String> commandAliases) {
+                          Map<String, String> commandAliases,
+                          Map<UiFlow, Boolean> uiDefaults) {
         this.requestExpireSeconds = Math.max(0L, requestExpireSeconds);
         this.teleportDelaySeconds = Math.max(0L, teleportDelaySeconds);
         this.teleportToLiveLocation = teleportToLiveLocation;
@@ -61,6 +64,7 @@ public final class PluginSettings {
         this.logEvents = logEvents;
         this.cooldownGroups = List.copyOf(cooldownGroups);
         this.commandAliases = Map.copyOf(commandAliases);
+        this.uiDefaults = new EnumMap<>(uiDefaults);
     }
 
     public static PluginSettings fromConfig(FileConfiguration config) {
@@ -79,10 +83,11 @@ public final class PluginSettings {
         boolean logEvents = config.getBoolean("log-events", false);
         List<CooldownGroup> groups = loadCooldownGroups(config.getConfigurationSection("cooldown-groups"));
         Map<String, String> aliases = loadCommandAliases(config.getConfigurationSection("command-aliases"));
+        Map<UiFlow, Boolean> uiDefaults = loadUiDefaults(config.getConfigurationSection("ui-defaults"));
         return new PluginSettings(requestExpire, teleportDelay, liveLocation,
                 retractPending, cancelWarmup, resetOnAccept, resetOnDeny, autoAcceptTpahere,
                 cancelOnMove, acceptMostRecent, invulnerabilitySeconds, permissionBypasses,
-                logEvents, groups, aliases);
+                logEvents, groups, aliases, uiDefaults);
     }
 
     public long requestExpireSeconds() {
@@ -145,6 +150,11 @@ public final class PluginSettings {
         return commandAliases;
     }
 
+    public boolean uiDefaultFor(UiFlow flow) {
+        Boolean value = uiDefaults.get(flow);
+        return value != null && value;
+    }
+
     private static List<CooldownGroup> loadCooldownGroups(ConfigurationSection section) {
         if (section == null) {
             return List.of(new CooldownGroup("default", "", 30L));
@@ -162,6 +172,25 @@ public final class PluginSettings {
             groups.add(new CooldownGroup("default", "", 30L));
         }
         return groups;
+    }
+
+    private static Map<UiFlow, Boolean> loadUiDefaults(ConfigurationSection section) {
+        Map<UiFlow, Boolean> result = new EnumMap<>(UiFlow.class);
+        for (UiFlow flow : UiFlow.values()) {
+            result.put(flow, false);
+        }
+        if (section == null) {
+            return result;
+        }
+        for (String key : section.getKeys(false)) {
+            UiFlow flow = UiFlow.fromKey(key);
+            if (flow == null) {
+                continue;
+            }
+            String mode = section.getString(key, "chat");
+            result.put(flow, "gui".equalsIgnoreCase(mode));
+        }
+        return result;
     }
 
     private static Map<String, String> loadCommandAliases(ConfigurationSection section) {
