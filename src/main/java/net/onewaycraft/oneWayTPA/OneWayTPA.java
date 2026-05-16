@@ -2,6 +2,7 @@ package net.onewaycraft.oneWayTPA;
 
 import net.onewaycraft.oneWayTPA.api.OneWayTpaApiImpl;
 import net.onewaycraft.oneWayTPA.api.OneWayTpaProvider;
+import net.onewaycraft.oneWayTPA.gui.GuiListener;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -42,6 +43,7 @@ public final class OneWayTPA extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerMoveListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerDamageListener(this), this);
+        getServer().getPluginManager().registerEvents(new GuiListener(), this);
     }
 
     @Override
