@@ -1,7 +1,7 @@
 # OneWayTPA
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.4.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](CHANGELOG.md)
 [![Paper](https://img.shields.io/badge/Paper-1.21.x-orange.svg)](https://papermc.io)
 [![Folia](https://img.shields.io/badge/Folia-supported-green.svg)](https://papermc.io/software/folia)
 [![Java](https://img.shields.io/badge/Java-21-red.svg)](https://adoptium.net)
@@ -12,12 +12,14 @@ A Paper/Folia plugin that provides a one-way TPA request system with cooldowns, 
 
 - **`/tpa` and `/tpahere`** request flow with clickable accept/deny prompts.
 - **Per-permission cooldown groups** with priority-ordered resolution.
+- **Permission overrides** for warmup, post-teleport invulnerability, and move-cancel — VIPs can skip the warmup, staff can move during it, anyone can be granted a longer invulnerability window.
+- **Optional inventory GUIs** for receiving prompts, sending requests, listing pending, and managing settings — opt-in per player and per flow.
 - **Two independent `/tpacancel` modes** (`retract-pending` and `cancel-warmup`) so you can tune the UX for your server.
 - **Snapshot or live destination** — pick whether the teleport lands where the destination player stood at accept time, or where they are when the warmup ends.
-- **Auto-accept** (global or per-player) and **ignore** (global or per-player).
+- **Auto-accept** (global or per-player) and **ignore** (global or per-player) — both persist across restarts.
 - **Console-friendly `/onewaytpa` admin meta-command** with `reload`, `version`, `cancel`, and `info` subcommands.
 - **Runtime command aliases** loaded from `config.yml` — admins can map any alias to any canonical command without rebuilding.
-- **Public API** with six custom events for downstream plugin integrations.
+- **Public API** with seven custom events for downstream plugin integrations.
 - **Folia-compatible**: uses `GlobalRegionScheduler` and `Player#teleportAsync` throughout.
 
 ## Requirements
@@ -44,7 +46,7 @@ Windows:
 .\gradlew.bat build
 ```
 
-The resulting JAR is at `build/libs/OneWayTPA-2.4.0.jar`.
+The resulting JAR is at `build/libs/OneWayTPA-3.0.0.jar`.
 
 ## Commands
 
@@ -57,6 +59,9 @@ The resulting JAR is at `build/libs/OneWayTPA-2.4.0.jar`.
 | `/tpauto [player]` | No args: toggle global auto-accept. With a player arg: toggle per-player auto-accept | `onewaytpa.tpauto` | ✓ | — |
 | `/tpaignore [player]` | Toggle global ignore or per-player ignore | `onewaytpa.tpaignore` | ✓ | — |
 | `/tpacancel` | Retract own pending request, or cancel an in-flight warmup (see config) | `onewaytpa.tpacancel` | ✓ | — |
+| `/tpaprofile` | View / change your per-flow UI preferences (chat vs GUI) | `onewaytpa.profile` | ✓ | — |
+| `/tpamenu` | Open the OneWayTPA settings GUI | `onewaytpa.menu` | ✓ | — |
+| `/tpapending` | List your incoming pending requests (chat or GUI) | `onewaytpa.pending` | ✓ | — |
 | `/tpareload` | Reload `config.yml` and `lang.yml` | `onewaytpa.reload` | ✓ | ✓ |
 | `/onewaytpa reload` | Same as `/tpareload`, but available on console | `onewaytpa.admin.reload` | ✓ | ✓ |
 | `/onewaytpa version` | Print the plugin version | `onewaytpa.admin.version` | ✓ | ✓ |
@@ -70,11 +75,18 @@ The resulting JAR is at `build/libs/OneWayTPA-2.4.0.jar`.
 | `onewaytpa.use` | Bundle of all per-command player permissions | `true` |
 | `onewaytpa.*` | All permissions, including admin and reload | `op` |
 | `onewaytpa.tpa`, `.tpahere`, `.tpaccept`, `.tpadeny`, `.tpauto`, `.tpaignore`, `.tpacancel` | Individual command permissions | `true` |
+| `onewaytpa.profile`, `.menu`, `.pending` | Profile / menu / pending list commands | `true` |
 | `onewaytpa.tpaauto` | Legacy node from 1.x / 2.0 — grants `onewaytpa.tpauto` for backward compatibility | `false` |
 | `onewaytpa.reload` | Allows `/tpareload` | `op` |
 | `onewaytpa.admin` | Bundle of all `/onewaytpa` admin subcommands | `op` |
 | `onewaytpa.admin.reload`, `.version`, `.cancel`, `.info` | Per-subcommand admin permissions | `op` |
 | `onewaytpa.cooldown.<group>` | Membership in a cooldown group; configured by you in `config.yml` | (server policy) |
+| `onewaytpa.bypass.*` | Bundle of all bypass permissions | `false` |
+| `onewaytpa.bypass.move` | Holder can move during a warmup without cancelling the teleport | `false` |
+| `onewaytpa.warmup.<seconds>` | Override the warmup delay to `<seconds>` for the holder. Multiple matching nodes resolve to the **lowest** value | (not granted) |
+| `onewaytpa.invulnerability.<seconds>` | Override the post-teleport invulnerability duration to `<seconds>` for the holder. Multiple matching nodes resolve to the **highest** value | (not granted) |
+
+All bypass and override permissions are gated by the `permission-bypasses-enabled` config flag. Set it to `false` to disable the entire override system server-wide.
 
 ## Configuration
 
@@ -132,6 +144,19 @@ accept-most-recent-without-args: true
 # Seconds of post-teleport invulnerability. All incoming damage is cancelled
 # for the teleported player during this window. 0 disables. Default 0.
 post-teleport-invulnerability-seconds: 0
+
+# When true, OneWayTPA honours bypass and override permissions
+# (e.g. onewaytpa.bypass.move, onewaytpa.warmup.<seconds>). See the
+# Permissions section for the full list. Default true.
+permission-bypasses-enabled: true
+
+# Default UI mode per flow for players who have not set a preference.
+# "gui" opens an inventory; "chat" uses the clickable chat prompts. Each
+# player can override via /tpaprofile or the settings GUI (/tpamenu).
+ui-defaults:
+  receive: chat
+  send: chat
+  pending: chat
 
 # When true, OneWayTPA logs admin-facing INFO lines for request flow events.
 log-events: false
@@ -210,6 +235,42 @@ When a teleport's warmup begins, both the requester and the receiver receive the
 
 Set `post-teleport-invulnerability-seconds` to any positive integer to grant the teleported player a brief damage-immunity window after the teleport completes. Useful for preventing ambush kills right after a `/tpa` and for letting players load the new area without taking damage. The window covers **all** damage sources — PvP, mobs, fall, lava, void — and is reset to its full duration if the player teleports again before the previous window expires. Defaults to `0` (disabled) to preserve the existing behaviour.
 
+### Permission overrides
+
+Two scalar permission patterns let admins grant per-player exceptions to the warmup and invulnerability defaults without touching `config.yml`:
+
+| Pattern | Effect | Aggregation |
+|---|---|---|
+| `onewaytpa.warmup.<seconds>` | Override the teleport warmup for the holder. `onewaytpa.warmup.0` = instant teleport, `onewaytpa.warmup.2` = 2-second warmup, etc. | Lowest matching value wins (lower = more privileged) |
+| `onewaytpa.invulnerability.<seconds>` | Override the post-teleport invulnerability duration for the holder. `onewaytpa.invulnerability.10` = 10 seconds, `.0` = no invuln. | Highest matching value wins (higher = more privileged) |
+
+Plus one boolean bypass:
+
+- **`onewaytpa.bypass.move`** — holder can move during the warmup without cancelling the teleport. Useful for staff doing teleport sweeps.
+
+All three are gated by `permission-bypasses-enabled: true` in `config.yml`. Flip it off to disable the entire override system without revoking the permissions individually.
+
+### Player profile and UI mode
+
+Each player has a per-flow UI preference stored in `preferences.yml`. Three flows are exposed:
+
+- **`receive`** — opening the GUI when an incoming `/tpa` or `/tpahere` arrives. Defaults to chat.
+- **`send`** — opening a player-picker GUI when the player runs `/tpa` or `/tpahere` with no arguments. Defaults to chat (which shows the usage message instead).
+- **`pending`** — opening the pending-requests GUI when the player runs `/tpapending`. Defaults to chat (numbered list with clickable buttons).
+
+Players manage their own preferences via `/tpaprofile`:
+
+```
+/tpaprofile                  # show current settings
+/tpaprofile gui receive on   # opt into the receive GUI
+/tpaprofile gui send off     # opt out of the send GUI
+/tpaprofile reset            # revert to server defaults
+```
+
+Or via the settings GUI: `/tpamenu`. The GUI also exposes the global auto-accept and ignore toggles. Server-wide defaults live in `config.yml` under `ui-defaults`.
+
+The receive GUI auto-falls back to the chat prompt if the player already has another inventory open (chest, anvil, etc.) — so an opted-in player never silently misses a request.
+
 ## Public API
 
 External plugins can integrate via `OneWayTpaApi`. Add a `depend: [OneWayTPA]` or `softdepend: [OneWayTPA]` entry to your own `plugin.yml`.
@@ -235,6 +296,15 @@ int retracted = api.retractPendingRequests(sender);
 | `TpaRequestExpireEvent` | no | After a pending request expires |
 | `TpaTeleportEvent` | yes | Just before the warmup teleport is executed |
 | `TpaTeleportCompleteEvent` | no | After a successful teleport (may fire async) |
+
+## Migrating from 2.4
+
+`3.0.0` is purely additive on top of `2.4.0` — no breaking changes, every new feature defaults to off / chat:
+
+- **`permission-bypasses-enabled: true` is the new default**, but no bypass permissions are granted to anyone by default — so nothing changes until an admin grants `onewaytpa.bypass.move`, `onewaytpa.warmup.<seconds>`, or `onewaytpa.invulnerability.<seconds>`.
+- **`ui-defaults` defaults all three flows to `chat`** — every player continues to get the 2.4 chat prompts. Enable GUI mode server-wide by flipping any flow to `gui`, or let players opt in individually via `/tpaprofile`.
+- **`preferences.yml` gains an optional `gui-flows` section.** Existing files are read as-is; the new section is created on demand the first time a player sets a UI preference.
+- **New commands `/tpaprofile`, `/tpamenu`, `/tpapending`** are auto-granted (default `true`) to anyone with `onewaytpa.use`. Strip them from the bundle if you don't want them.
 
 ## Migrating from 2.3
 

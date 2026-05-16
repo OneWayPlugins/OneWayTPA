@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-05-16
+
+### Added
+
+- `permission-bypasses-enabled` config flag (default `true`) — master switch for the new bypass and override permissions.
+- `onewaytpa.bypass.move` permission — holder can move during a teleport warmup without cancelling the teleport (bypasses `cancel-on-move`).
+- `onewaytpa.warmup.<seconds>` scalar permission pattern — overrides `teleport-delay-seconds` per holder. The lowest matching value wins (lower = more privileged). `onewaytpa.warmup.0` = instant teleport.
+- `onewaytpa.invulnerability.<seconds>` scalar permission pattern — overrides `post-teleport-invulnerability-seconds` per holder. The highest matching value wins (higher = more privileged).
+- New `PermissionResolver` class scans `Player.getEffectivePermissions()` for the scalar prefixes, parses the integer suffix, and aggregates per metric.
+- New `UiFlow` enum (`RECEIVE`, `SEND`, `PENDING`) representing per-flow UI mode preferences.
+- `ui-defaults` config section setting the server-wide default (`gui` or `chat`) for each `UiFlow`. Defaults all three to `chat` so 2.4 behaviour is preserved.
+- `preferences.yml` gained a `gui-flows` section recording per-player overrides of the UI mode for each flow.
+- New `/tpaprofile` command (perm `onewaytpa.profile`, default `true`) for listing, toggling, and resetting per-flow UI preferences. Subcommands: `gui <flow> <on|off>`, `reset`.
+- New `/tpamenu` command (perm `onewaytpa.menu`, default `true`) opens a 36-slot settings GUI exposing the global auto-accept toggle, the global ignore toggle, the per-flow UI toggles, a reset button, and a shortcut to the pending-requests GUI.
+- New `/tpapending` command (perm `onewaytpa.pending`, default `true`) lists incoming pending requests. Renders as a numbered chat list with clickable buttons by default, or opens a 36-slot paginated GUI when the player has `UiFlow.PENDING` set to `gui`.
+- New `gui` package with `BaseInventoryHolder`, `GuiListener` (single shared listener), `GuiItems` (named items, player heads, filler), and four GUI screens: `ReceiveRequestGui`, `SendRequestGui`, `SettingsGui`, `PendingRequestsGui`.
+- `ReceiveRequestGui` opens automatically for receivers with `UiFlow.RECEIVE` set to `gui`, showing the sender's head and two Accept / two Deny buttons. Falls back to the chat prompt if the receiver is already in another inventory.
+- `SendRequestGui` opens when a player runs `/tpa` or `/tpahere` with no arguments and has `UiFlow.SEND` set to `gui`. Paginated player picker listing all online players; click a head to dispatch the command for that target.
+- New lang keys: `profile-header`, `profile-line`, `profile-flow-set`, `profile-reset`, `profile-unknown-flow`, `profile-usage`, `pending-header`.
+
+### Changed
+
+- `TeleportService.schedule` now resolves the warmup delay per call via the new `PermissionResolver`. The captured `delaySeconds` field is removed.
+- `TeleportService.grantInvulnerability` now resolves the invulnerability duration via the resolver instead of reading the config directly.
+- `TpaService` constructor accepts a `PermissionResolver` and threads it into the move bypass and `TeleportService`.
+- `PreferenceService` constructor accepts a `PluginSettings` so it can resolve per-flow UI defaults for players without explicit overrides.
+- `TpaService.preferenceService()` and `TpaService.pluginSettings()` are now public so the `gui` subpackage can read live preference state.
+- `RequestService` gained `pendingForReceiver(UUID)` returning the full `TeleportRequest` list (id-ordered) for use by the GUI surfaces.
+- `BaseInventoryHolder` exposes `clearHandlers()` for paginated GUIs that re-render on navigation.
+
+### Migrating from 2.4
+
+`3.0.0` is purely additive — every new feature defaults to off or chat.
+
+- `permission-bypasses-enabled: true` is the new default, but no bypass permissions are granted by default. Existing servers see no behaviour change until an admin grants one of the new nodes.
+- `ui-defaults` defaults all three flows to `chat`. Players continue to get the 2.4 chat prompts; opt-in via `/tpaprofile` or by flipping a flow to `gui` in `config.yml`.
+- Existing `preferences.yml` files are read as-is; the new `gui-flows` section is created on demand.
+- The new commands `/tpaprofile`, `/tpamenu`, `/tpapending` are bundled into `onewaytpa.use` and so are auto-granted. Strip them from the bundle if you don't want them exposed.
+
 ## [2.4.0] - 2026-05-15
 
 ### Added
