@@ -72,6 +72,13 @@ messages:
 
   reload-success: "&aConfiguration and messages reloaded."
 
+  profile-header: "&6Your OneWayTPA preferences:"
+  profile-line: "  &7{flow}: &f{value}"
+  profile-flow-set: "&aPreference &e{flow} &aset to &f{value}&a."
+  profile-reset: "&aPreferences reset to server defaults."
+  profile-unknown-flow: "&cUnknown flow. Use receive, send, or pending."
+  profile-usage: "&eUsage: /tpaprofile [gui <flow> <on|off> | reset]"
+
   admin-usage: |
     &eOneWayTPA admin commands:
     &e/onewaytpa reload &7- Reload config and messages

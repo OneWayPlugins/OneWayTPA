@@ -121,6 +121,15 @@ public final class OneWayTPA extends JavaPlugin {
         } else {
             getLogger().severe("Command missing in plugin.yml: onewaytpa");
         }
+
+        TpaProfileCommand profileHandler = new TpaProfileCommand(messages, tpaService);
+        PluginCommand profileCmd = getCommand("tpaprofile");
+        if (profileCmd != null) {
+            profileCmd.setExecutor(profileHandler);
+            profileCmd.setTabCompleter(profileHandler);
+        } else {
+            getLogger().severe("Command missing in plugin.yml: tpaprofile");
+        }
     }
 
     private void registerCommand(String commandName, TpaCommand handler) {

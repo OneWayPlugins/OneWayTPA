@@ -35,6 +35,10 @@ commands:
     description: Cancel a pending teleport during the warmup window.
     usage: /tpacancel
     permission: onewaytpa.tpacancel
+  tpaprofile:
+    description: View or change your OneWayTPA UI preferences.
+    usage: /tpaprofile [gui <flow> <on|off> | reset]
+    permission: onewaytpa.profile
   tpareload:
     description: Reload OneWayTPA configuration and messages.
     usage: /tpareload
@@ -68,6 +72,7 @@ permissions:
       onewaytpa.tpauto: true
       onewaytpa.tpaignore: true
       onewaytpa.tpacancel: true
+      onewaytpa.profile: true
   onewaytpa.tpa:
     description: Allows using /tpa.
     default: true
@@ -93,6 +98,9 @@ permissions:
     default: true
   onewaytpa.tpacancel:
     description: Allows using /tpacancel.
+    default: true
+  onewaytpa.profile:
+    description: Allows using /tpaprofile to view and change UI preferences.
     default: true
   onewaytpa.reload:
     description: Allows using /tpareload.
