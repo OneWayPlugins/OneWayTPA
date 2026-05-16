@@ -1,5 +1,6 @@
 package net.onewaycraft.oneWayTPA;
 
+import net.onewaycraft.oneWayTPA.gui.SendRequestGui;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -61,6 +62,11 @@ public final class TpaCommand implements CommandExecutor, TabCompleter {
     }
 
     private void handleSend(Player sender, String[] args, RequestType type) {
+        if (args.length == 0
+                && service.preferenceService().isGuiEnabled(sender.getUniqueId(), UiFlow.SEND)) {
+            new SendRequestGui(sender, type).open(sender);
+            return;
+        }
         if (args.length != 1) {
             String usageKey = type == RequestType.TPA ? "usage-tpa" : "usage-tpahere";
             messages.send(sender, usageKey);

@@ -28,6 +28,10 @@ public abstract class BaseInventoryHolder implements InventoryHolder {
         handlers.put(slot, handler);
     }
 
+    protected void clearHandlers() {
+        handlers.clear();
+    }
+
     public void dispatch(InventoryClickEvent event) {
         Consumer<InventoryClickEvent> handler = handlers.get(event.getRawSlot());
         if (handler != null) {
