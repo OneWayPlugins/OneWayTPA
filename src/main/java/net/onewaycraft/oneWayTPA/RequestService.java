@@ -99,6 +99,16 @@ public final class RequestService {
         return names;
     }
 
+    public List<TeleportRequest> pendingForReceiver(UUID receiverId) {
+        Map<UUID, TeleportRequest> receiverRequests = pendingRequests.get(receiverId);
+        if (receiverRequests == null || receiverRequests.isEmpty()) {
+            return List.of();
+        }
+        List<TeleportRequest> result = new ArrayList<>(receiverRequests.values());
+        result.sort(Comparator.comparingLong(TeleportRequest::id));
+        return result;
+    }
+
     public boolean hasPendingRequest(UUID receiverId, UUID senderId) {
         Map<UUID, TeleportRequest> receiverRequests = pendingRequests.get(receiverId);
         return receiverRequests != null && receiverRequests.containsKey(senderId);

@@ -79,6 +79,8 @@ messages:
   profile-unknown-flow: "&cUnknown flow. Use receive, send, or pending."
   profile-usage: "&eUsage: /tpaprofile [gui <flow> <on|off> | reset]"
 
+  pending-header: "&6You have &e{count} &6pending teleport request(s):"
+
   admin-usage: |
     &eOneWayTPA admin commands:
     &e/onewaytpa reload &7- Reload config and messages

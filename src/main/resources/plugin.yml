@@ -39,6 +39,14 @@ commands:
     description: View or change your OneWayTPA UI preferences.
     usage: /tpaprofile [gui <flow> <on|off> | reset]
     permission: onewaytpa.profile
+  tpamenu:
+    description: Open the OneWayTPA settings GUI.
+    usage: /tpamenu
+    permission: onewaytpa.menu
+  tpapending:
+    description: List your incoming pending TPA requests.
+    usage: /tpapending
+    permission: onewaytpa.pending
   tpareload:
     description: Reload OneWayTPA configuration and messages.
     usage: /tpareload
@@ -73,6 +81,8 @@ permissions:
       onewaytpa.tpaignore: true
       onewaytpa.tpacancel: true
       onewaytpa.profile: true
+      onewaytpa.menu: true
+      onewaytpa.pending: true
   onewaytpa.tpa:
     description: Allows using /tpa.
     default: true
@@ -101,6 +111,12 @@ permissions:
     default: true
   onewaytpa.profile:
     description: Allows using /tpaprofile to view and change UI preferences.
+    default: true
+  onewaytpa.menu:
+    description: Allows using /tpamenu to open the settings GUI.
+    default: true
+  onewaytpa.pending:
+    description: Allows using /tpapending to list incoming requests.
     default: true
   onewaytpa.reload:
     description: Allows using /tpareload.

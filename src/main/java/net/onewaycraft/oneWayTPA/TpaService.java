@@ -237,6 +237,10 @@ public final class TpaService {
         return requests.pendingSenders(receiver.getUniqueId());
     }
 
+    public List<TeleportRequest> pendingRequestsFor(Player receiver) {
+        return requests.pendingForReceiver(receiver.getUniqueId());
+    }
+
     public String mostRecentPendingSenderName(Player receiver) {
         return requests.mostRecentSenderName(receiver.getUniqueId());
     }
@@ -245,7 +249,7 @@ public final class TpaService {
         return cooldowns;
     }
 
-    PreferenceService preferenceService() {
+    public PreferenceService preferenceService() {
         return preferences;
     }
 
@@ -257,7 +261,7 @@ public final class TpaService {
         return invulnerability;
     }
 
-    PluginSettings pluginSettings() {
+    public PluginSettings pluginSettings() {
         return settings;
     }
 

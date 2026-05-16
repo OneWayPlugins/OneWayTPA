@@ -132,6 +132,22 @@ public final class OneWayTPA extends JavaPlugin {
         } else {
             getLogger().severe("Command missing in plugin.yml: tpaprofile");
         }
+
+        TpaMenuCommand menuHandler = new TpaMenuCommand(messages, tpaService);
+        PluginCommand menuCmd = getCommand("tpamenu");
+        if (menuCmd != null) {
+            menuCmd.setExecutor(menuHandler);
+        } else {
+            getLogger().severe("Command missing in plugin.yml: tpamenu");
+        }
+
+        TpaPendingCommand pendingHandler = new TpaPendingCommand(messages, tpaService);
+        PluginCommand pendingCmd = getCommand("tpapending");
+        if (pendingCmd != null) {
+            pendingCmd.setExecutor(pendingHandler);
+        } else {
+            getLogger().severe("Command missing in plugin.yml: tpapending");
+        }
     }
 
     private void registerCommand(String commandName, TpaCommand handler) {
