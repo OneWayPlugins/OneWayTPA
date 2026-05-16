@@ -117,3 +117,11 @@ permissions:
   onewaytpa.admin.info:
     description: Allows /onewaytpa info <player>.
     default: op
+  onewaytpa.bypass.*:
+    description: All bypass permissions for OneWayTPA toggles.
+    default: false
+    children:
+      onewaytpa.bypass.move: true
+  onewaytpa.bypass.move:
+    description: Allows the holder to move during a teleport warmup without cancelling it.
+    default: false

@@ -31,7 +31,8 @@ public final class OneWayTPA extends JavaPlugin {
 
         this.messages = new MessageService(this);
         PluginSettings settings = PluginSettings.fromConfig(getConfig());
-        this.tpaService = new TpaService(this, messages, settings);
+        PermissionResolver permissions = new PermissionResolver(settings);
+        this.tpaService = new TpaService(this, messages, settings, permissions);
         this.aliasRegistrar = new AliasRegistrar(this);
 
         registerApi();
@@ -63,11 +64,12 @@ public final class OneWayTPA extends JavaPlugin {
 
         this.messages = new MessageService(this);
         PluginSettings settings = PluginSettings.fromConfig(getConfig());
+        PermissionResolver permissions = new PermissionResolver(settings);
 
         if (tpaService != null) {
             tpaService.shutdown();
         }
-        this.tpaService = new TpaService(this, messages, settings);
+        this.tpaService = new TpaService(this, messages, settings, permissions);
 
         registerApi();
         registerCommands();

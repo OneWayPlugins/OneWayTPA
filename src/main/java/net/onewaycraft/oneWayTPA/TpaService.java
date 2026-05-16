@@ -33,16 +33,19 @@ public final class TpaService {
     private final OneWayTPA plugin;
     private final MessageService messages;
     private final PluginSettings settings;
+    private final PermissionResolver permissions;
     private final CooldownService cooldowns;
     private final PreferenceService preferences;
     private final RequestService requests;
     private final InvulnerabilityService invulnerability;
     private final TeleportService teleports;
 
-    public TpaService(OneWayTPA plugin, MessageService messages, PluginSettings settings) {
+    public TpaService(OneWayTPA plugin, MessageService messages, PluginSettings settings,
+                      PermissionResolver permissions) {
         this.plugin = plugin;
         this.messages = messages;
         this.settings = settings;
+        this.permissions = permissions;
         this.cooldowns = new CooldownService(settings.cooldownGroups());
         this.preferences = new PreferenceService(plugin);
         this.requests = new RequestService();
@@ -265,6 +268,9 @@ public final class TpaService {
 
     public void handlePlayerMoved(Player player) {
         if (!settings.cancelOnMove()) {
+            return;
+        }
+        if (permissions.canBypassMoveCancel(player)) {
             return;
         }
         teleports.cancelIfMovedFromStart(player);
