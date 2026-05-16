@@ -50,7 +50,7 @@ public final class TpaService {
         this.preferences = new PreferenceService(plugin);
         this.requests = new RequestService();
         this.invulnerability = new InvulnerabilityService();
-        this.teleports = new TeleportService(plugin, messages, settings, invulnerability);
+        this.teleports = new TeleportService(plugin, messages, settings, permissions, invulnerability);
     }
 
     public boolean sendRequest(Player sender, Player receiver, RequestType type) {

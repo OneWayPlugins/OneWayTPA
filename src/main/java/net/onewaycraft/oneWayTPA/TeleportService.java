@@ -31,18 +31,18 @@ public final class TeleportService {
     private final Plugin plugin;
     private final MessageService messages;
     private final PluginSettings settings;
+    private final PermissionResolver permissions;
     private final InvulnerabilityService invulnerability;
-    private final long delaySeconds;
     private final AtomicLong teleportIdCounter = new AtomicLong();
     private final Map<Long, PendingTeleport> pendingTeleports = new ConcurrentHashMap<>();
 
     public TeleportService(Plugin plugin, MessageService messages, PluginSettings settings,
-                           InvulnerabilityService invulnerability) {
+                           PermissionResolver permissions, InvulnerabilityService invulnerability) {
         this.plugin = plugin;
         this.messages = messages;
         this.settings = settings;
+        this.permissions = permissions;
         this.invulnerability = invulnerability;
-        this.delaySeconds = Math.max(0L, settings.teleportDelaySeconds());
     }
 
     public void schedule(TeleportRequest request,
@@ -64,18 +64,24 @@ public final class TeleportService {
                 startLocation.clone()
         );
 
-        if (delaySeconds <= 0L) {
+        Player teleported = Bukkit.getPlayer(teleportedPlayerId);
+        long effectiveDelay = (teleported != null && teleported.isOnline())
+                ? permissions.resolveWarmupSeconds(teleported)
+                : settings.teleportDelaySeconds();
+        effectiveDelay = Math.max(0L, effectiveDelay);
+
+        if (effectiveDelay <= 0L) {
             execute(pending);
             return;
         }
 
         pendingTeleports.put(pending.id(), pending);
-        notifyTeleportDelay(pending, delaySeconds);
+        notifyTeleportDelay(pending, effectiveDelay);
 
         plugin.getServer().getGlobalRegionScheduler().runDelayed(
                 plugin,
                 task -> runScheduledTeleport(pending.id()),
-                delaySeconds * TICKS_PER_SECOND
+                effectiveDelay * TICKS_PER_SECOND
         );
     }
 
