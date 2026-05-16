@@ -225,7 +225,7 @@ public final class TeleportService {
     }
 
     private void grantInvulnerability(Player teleported) {
-        long seconds = settings.postTeleportInvulnerabilitySeconds();
+        long seconds = permissions.resolveInvulnerabilitySeconds(teleported);
         if (seconds <= 0L) {
             return;
         }
