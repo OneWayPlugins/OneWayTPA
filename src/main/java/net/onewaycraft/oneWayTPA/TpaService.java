@@ -8,8 +8,10 @@ import net.onewaycraft.oneWayTPA.api.event.TpaRequestDenyEvent;
 import net.onewaycraft.oneWayTPA.api.event.TpaRequestEvent;
 import net.onewaycraft.oneWayTPA.api.event.TpaRequestExpireEvent;
 import net.onewaycraft.oneWayTPA.api.event.TpaRequestRetractEvent;
+import net.onewaycraft.oneWayTPA.gui.ReceiveRequestGui;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 
 import java.util.List;
 import java.util.Map;
@@ -288,7 +290,18 @@ public final class TpaService {
         String receivedKey = type == RequestType.TPA ? "request-received-tpa" : "request-received-tpahere";
         messages.send(sender, sentKey, Map.of("player", receiver.getName()));
         messages.send(receiver, receivedKey, Map.of("player", sender.getName()));
-        sendClickableDecision(receiver, sender.getName());
+        if (shouldOpenReceiveGui(receiver)) {
+            new ReceiveRequestGui(sender, type).open(receiver);
+        } else {
+            sendClickableDecision(receiver, sender.getName());
+        }
+    }
+
+    private boolean shouldOpenReceiveGui(Player receiver) {
+        if (!preferences.isGuiEnabled(receiver.getUniqueId(), UiFlow.RECEIVE)) {
+            return false;
+        }
+        return receiver.getOpenInventory().getType() == InventoryType.CRAFTING;
     }
 
     private void sendClickableDecision(Player receiver, String senderName) {
