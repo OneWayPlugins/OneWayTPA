@@ -295,7 +295,7 @@ public final class TpaService {
         messages.send(sender, sentKey, Map.of("player", receiver.getName()));
         messages.send(receiver, receivedKey, Map.of("player", sender.getName()));
         if (shouldOpenReceiveGui(receiver)) {
-            new ReceiveRequestGui(sender, type).open(receiver);
+            openReceiveGuiOnReceiverRegion(sender, receiver, type);
         } else {
             sendClickableDecision(receiver, sender.getName());
         }
@@ -306,6 +306,16 @@ public final class TpaService {
             return false;
         }
         return receiver.getOpenInventory().getType() == InventoryType.CRAFTING;
+    }
+
+    private void openReceiveGuiOnReceiverRegion(Player sender, Player receiver, RequestType type) {
+        receiver.getScheduler().run(plugin,
+                task -> {
+                    if (receiver.isOnline()) {
+                        new ReceiveRequestGui(sender, type).open(receiver);
+                    }
+                },
+                null);
     }
 
     private void sendClickableDecision(Player receiver, String senderName) {
